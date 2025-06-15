@@ -1,0 +1,21 @@
+streamlit
+st-click-detector
+openai # dependency for langchain-openai
+langchain # not sure this is being used
+langchain-openai
+langchain_qdrant
+langchain-ollama
+langsmith # tracing
+qdrant-client   # testing removing this for pydantic issue ==1.6.3
+pandas
+pytest # testing
+openpyxl # used to import the library.xlsx file
+requests==2.32.3 #  for GitHub Actions. used to access qdrant
+selenium==4.25 #  for GitHub Actions. needed to check for app Streamlit suspension due to inactivity
+streamlit_extras
+streamlit_feedback 
+tiktoken # not sure this is being used
+webdriver-manager==4.0.2  #  for GitHub Actions. Check for Streamlit app suspension due to inactivity
+
+git+https://github.com/drew-wks/uscgaux.git@main#egg=uscgaux
+
