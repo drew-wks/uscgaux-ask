@@ -303,6 +303,7 @@ def create_source_lists(response, registry_df: pd.DataFrame | None = None):
 
         title = row.get('title', '')
         date = row.get('issue_date', '')[:4]
+        link = row.get('link', '')
         page = str(int(doc.metadata.get('page', 0)) + 1)
         publication_number = (lambda x: (s := str(x).strip()) and s or " ")(row.get('publication_number'))
         scope = (lambda x: " " if not x or str(x).strip().lower() == "national" else str(x).strip())(row.get('scope'))
@@ -314,7 +315,7 @@ def create_source_lists(response, registry_df: pd.DataFrame | None = None):
         
         page_content = doc.page_content  
         long_source_markdown_list.append(
-            f"**Reference {i}:**  \n    {scope} {unit} {title} [{date}], page {page}  \n  {publication_number}  \n  {organization}\n   {scope} {unit}\n\n  "
+            f"**Reference {i}:**  \n    {scope} {unit} {title} [{date}], page {page}  \n  {link}    \n  {publication_number}  \n  {organization}\n   {scope} {unit}\n\n  "
             f"{page_content}\n\n  "
             f"***  "
         )
