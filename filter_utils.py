@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, cast
 from datetime import datetime, timezone
 import pandas as pd
 from qdrant_client.http import models
@@ -40,8 +40,8 @@ def build_retrieval_filter(
     """
 
     fc = (filter_conditions or {}).copy()      # defensive copy
-    must: list[models.Filter | models.FieldCondition] = []
-    should: list[models.Filter | models.FieldCondition] = []
+    must: list[models.Condition] = []
+    should: list[models.Condition] = []
 
     # ── 1.  Global requirements (goes in MUST (AND)───────────────────────────────
     # Handle Expiration_date
@@ -49,7 +49,7 @@ def build_retrieval_filter(
         must.append(
             models.FieldCondition(
                 key="metadata.expiration_date",
-                range=models.DatetimeRange(gt=datetime.now(timezone.utc).isoformat()),
+                range=models.DatetimeRange(gt=datetime.now(timezone.utc)),
             )
         )
 
@@ -65,12 +65,12 @@ def build_retrieval_filter(
             )
 
     # ── 2.  Handle scope & unit (goes in SHOULD) ─────────────────────────
-    scope_val: str | None = fc.get("scope")
-    unit_val: str | None = fc.get("unit")
+    scope_val = cast(Optional[str], fc.get("scope"))
+    unit_val = cast(Optional[str], fc.get("unit"))
 
     if scope_val and scope_val.lower() != "national":
         # (a) District / Local filter  ➜ scope AND (optional) unit
-        scope_unit_must: list[models.FieldCondition] = [
+        scope_unit_must: list[models.Condition] = [
             models.FieldCondition(
                 key="metadata.scope", match=models.MatchValue(value=scope_val)
             )
@@ -150,28 +150,50 @@ def registry_pdf_id_filter(
         Unique ``pdf_id`` values matching the filter conditions.
     """
     fc = (filter_conditions or {}).copy()
-    df = registry_df.copy()
+    df: pd.DataFrame = registry_df.copy()
 
     if fc.pop("exclude_expired", False) and "expiration_date" in df.columns:
         now = datetime.now(timezone.utc)
         exp = pd.to_datetime(df["expiration_date"], errors="coerce", utc=True)
-        df = df[(exp.isna()) | (exp > now)]
+        df = cast(pd.DataFrame, df[(exp.isna()) | (exp > now)])
 
-    scope_val = fc.get("scope")
-    unit_val = fc.get("unit")
+    scope_val = cast(Optional[str], fc.get("scope"))
+    unit_val = cast(Optional[str], fc.get("unit"))
 
     if scope_val and scope_val.lower() != "national":
-        district = df[df["scope"].str.lower() == scope_val.lower()]
+        district = cast(
+            pd.DataFrame,
+            df[df["scope"].astype(str).str.lower() == scope_val.lower()],
+        )
         if unit_val:
-            district = district[district["unit"].str.lower() == str(unit_val).lower()]
-        national = df[df["scope"].str.lower() == "national"]
-        df = pd.concat([district, national], ignore_index=True)
+            district = district[
+                cast(pd.Series, district["unit"].astype(str)).str.lower()
+                == unit_val.lower()
+            ]
+        national = cast(
+            pd.DataFrame,
+            df[df["scope"].astype(str).str.lower() == "national"],
+        )
+        df = cast(pd.DataFrame, pd.concat([district, national], ignore_index=True))
     elif scope_val and scope_val.lower() == "national":
-        df = df[df["scope"].str.lower() == "national"]
+        df = cast(
+            pd.DataFrame,
+            df[df["scope"].astype(str).str.lower() == "national"],
+        )
         if unit_val:
-            df = df[df["unit"].str.lower() == str(unit_val).lower()]
+            df = cast(
+                pd.DataFrame,
+                df[
+                    cast(pd.Series, df["unit"].astype(str)).str.lower() == unit_val.lower()
+                ],
+            )
     elif unit_val:
-        df = df[df["unit"].str.lower() == str(unit_val).lower()]
+        df = cast(
+            pd.DataFrame,
+            df[
+                cast(pd.Series, df["unit"].astype(str)).str.lower() == unit_val.lower()
+            ],
+        )
 
     if "pdf_id" not in df.columns:
         return []

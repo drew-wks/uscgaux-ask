@@ -235,6 +235,7 @@ def rag(
     
     
     # Retrieve relevant documents using the enriched question
+    context: List = []
     try:
         context = retriever.invoke(enriched_question)
         print(f"\n📄 Retrieved context: {len(context)} documents")
