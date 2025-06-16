@@ -11,8 +11,9 @@ from langchain_qdrant import QdrantVectorStore
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_ollama import ChatOllama  # to test other LLMs
 from langchain_core.prompts import ChatPromptTemplate
-from langsmith import traceable  #RAG pipeline instrumentation platform
+from langsmith import traceable  # RAG pipeline instrumentation platform
 from filter_utils import build_retrieval_filter
+from registry import load_registry_and_date
 
 
 # st.secrets pulls from ~/.streamlit when run locally
@@ -141,6 +142,33 @@ def format_docs(docs):
     return "\n\n".join(doc.page_content for doc in docs)
 
 
+def attach_registry_metadata(docs: List, registry_df: pd.DataFrame) -> List:
+    """Merge registry metadata into each document's metadata using ``pdf_id``.
+
+    Parameters
+    ----------
+    docs : list
+        Documents returned from Qdrant.
+    registry_df : pandas.DataFrame
+        DataFrame containing registry metadata with a ``pdf_id`` column.
+
+    Returns
+    -------
+    list
+        Documents with metadata updated from the registry.
+    """
+    if "pdf_id" not in registry_df.columns:
+        return docs
+
+    indexed = registry_df.set_index("pdf_id")
+    for doc in docs:
+        pdf_id = doc.metadata.get("pdf_id")
+        if pdf_id and pdf_id in indexed.index:
+            row = indexed.loc[pdf_id]
+            doc.metadata.update(row.to_dict())
+    return docs
+
+
 
 # Schema for llm responses
 class AnswerWithSources(TypedDict):
@@ -204,13 +232,18 @@ def rag(
     # Retrieve relevant documents using the enriched question
     try:
         context = retriever.invoke(enriched_question)
-        response["context"] = context
         print(f"\n📄 Retrieved context: {len(context)} documents")
         if not context:
             response["answer"] = (
                 "❗️I couldn't find any documents that match your filters. Please try relaxing your filters."
             )
             return response
+
+        # Attach registry metadata based on pdf_id
+        registry_df, _ = load_registry_and_date()
+        context = attach_registry_metadata(context, registry_df)
+        response["context"] = context
+
     except Exception as e:
         print(f"⚠️ Retriever Error: {e}")
     
@@ -224,7 +257,7 @@ def rag(
         }
         llm_response = llm.invoke(prompt.format(**prompt_input))
         response["answer"] = llm_response.content
-        response["sources"] = [doc.metadata["title"] for doc in context]
+        response["sources"] = [doc.metadata.get("title", "") for doc in context]
         print("🧠 Received LLM response")
     except Exception as e:
         print(f"LLM Error: {e}")
@@ -241,7 +274,7 @@ def rag_for_eval(input: dict) -> dict:
     return {"answer": response["answer"]}
 
 
-def create_source_lists(response):
+def create_source_lists(response, registry_df: pd.DataFrame | None = None):
     """
     Creates and returns both the short and long source lists as strings.
 
@@ -255,15 +288,23 @@ def create_source_lists(response):
     """
     short_source_markdown_list = []
     long_source_markdown_list = []
-    
+
+    if registry_df is None:
+        registry_df, _ = load_registry_and_date()
+
+    indexed = registry_df.set_index("pdf_id") if "pdf_id" in registry_df.columns else None
+
     for i, doc in enumerate(response['context'], start=1):
-        title = doc.metadata['title']
-        date = doc.metadata['issue_date'][:4]
-        page = str(int(doc.metadata['page']) + 1) # no page 0
-        publication_number = (lambda x: (s := str(x).strip()) and s or " ")(doc.metadata.get("publication_number"))
-        scope = (lambda x: " " if not x or str(x).strip().lower() == "national" else str(x).strip())(doc.metadata.get("scope"))
-        unit = (lambda x: (s := str(x).strip()) and s or " ")(doc.metadata.get("unit"))
-        organization = (lambda x: f"Issuer: {x.strip()}" if x and x.strip() else None)(doc.metadata.get("organization"))
+        pdf_id = doc.metadata.get('pdf_id')
+        row = indexed.loc[pdf_id] if indexed is not None and pdf_id in indexed.index else {}
+
+        title = row.get('title', '')
+        date = row.get('issue_date', '')[:4]
+        page = str(int(doc.metadata.get('page', 0)) + 1)
+        publication_number = (lambda x: (s := str(x).strip()) and s or " ")(row.get('publication_number'))
+        scope = (lambda x: " " if not x or str(x).strip().lower() == "national" else str(x).strip())(row.get('scope'))
+        unit = (lambda x: (s := str(x).strip()) and s or " ")(row.get('unit'))
+        organization = (lambda x: f"Issuer: {x.strip()}" if x and x.strip() else None)(row.get('organization'))
 
 
         short_source_markdown_list.append(f"  *{scope} {unit} {title} [{date}], page {page}\n  ")
