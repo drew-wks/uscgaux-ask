@@ -4,6 +4,7 @@ import os  # needed for local testing
 import uuid
 from streamlit_feedback import streamlit_feedback
 from langsmith import Client
+from registry import load_registry_and_date
 
 
 
@@ -32,7 +33,7 @@ else:
 
 
 # Get the library catalog
-df, last_update_date = ui_utils.get_library_unified_and_date()
+df, last_update_date = load_registry_and_date()
 num_items = len(df)
 
 
