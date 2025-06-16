@@ -27,6 +27,10 @@ local/
 # Folders of PDFs
 *pdfs*/
 
+Local qdrant_db
+qdrant_db
+tests/qdrant_db
+
 
 # Distribution / packaging
 .Python
