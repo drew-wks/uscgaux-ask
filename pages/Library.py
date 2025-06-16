@@ -1,4 +1,4 @@
-import datetime
+
 import base64
 import os  # needed for local testing
 import sys
@@ -40,7 +40,8 @@ with tab2:
         st.markdown(f"{num_items} items. Last update: {last_update_date}")  
 
         # Display the DataFrame
-        display_df = df[['title', 'publication_number', 'organization', 'issue_date', 'expiration_date', 'scope', 'unit']]
+        #display_df = df[['title', 'publication_number', 'organization', 'issue_date', 'expiration_date', 'scope', 'unit']]
+        display_df = df
         edited_df = st.data_editor(display_df, use_container_width=True, hide_index=False, disabled=True)
         isim = f'ASK_catalog_export{last_update_date}.csv'
         indir = edited_df.to_csv(index=False)

@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+from datetime import datetime
 import gspread
 import streamlit as st
 from googleapiclient.discovery import build, Resource as DriveClient
@@ -104,9 +105,9 @@ def load_registry_and_date() -> tuple[pd.DataFrame, str]:
             fileId=spreadsheet_id,
             fields="modifiedTime"
         ).execute()
-        modified_time = file_metadata["modifiedTime"]
-        last_update_date = modified_time.strftime('%Y-%m-%dT%H:%M:%SZ') 
-        return df, last_update_date
+        modified_time_str = file_metadata["modifiedTime"]
+        modified_time = datetime.strptime(modified_time_str, "%Y-%m-%dT%H:%M:%S.%fZ")
+        return df, modified_time
 
     except Exception as e:
         os.write(2, f"❌ [load_registry] Error: {e}".encode())
