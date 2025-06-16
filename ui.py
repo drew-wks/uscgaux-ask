@@ -32,7 +32,7 @@ else:
 
 
 # Get the library catalog
-df, last_update_date = ui_utils.get_library_catalog_excel_and_date()
+df, last_update_date = ui_utils.get_library_unified_and_date()
 num_items = len(df)
 
 

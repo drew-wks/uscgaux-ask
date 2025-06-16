@@ -10,6 +10,8 @@ qdrant-client   # testing removing this for pydantic issue ==1.6.3
 pandas
 pytest # testing
 openpyxl # used to import the library.xlsx file
+gspread
+google-auth
 requests==2.32.3 #  for GitHub Actions. used to access qdrant
 selenium==4.25 #  for GitHub Actions. needed to check for app Streamlit suspension due to inactivity
 streamlit_extras

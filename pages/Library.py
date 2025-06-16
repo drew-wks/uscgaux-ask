@@ -5,6 +5,7 @@ import sys
 import streamlit as st
 st.set_page_config(page_title="ASK Auxiliary Source of Knowledge", initial_sidebar_state="collapsed")
 import pandas as pd
+from registry import load_registry_and_date
 import ui_utils
 
 
@@ -27,7 +28,7 @@ with tab1:
     
 
 with tab2:
-    df, last_update_date = ui_utils.get_library_catalog_excel_and_date()
+    df, last_update_date = load_registry_and_date()
     overview = ui_utils.get_markdown("docs/library_overview.md")
 
     if df is not None:
