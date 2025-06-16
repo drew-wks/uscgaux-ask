@@ -107,7 +107,7 @@ Library Administration
 2. Open the project in VS Code.
 3. Set up your local environment and python interpreter 
 4. Add your streamlit secrets into .secrets.toml
-  - `GOOGLE_SERVICE_ACCOUNT_JSON` – service account JSON (path or JSON string)
+  - `GCP_CREDENTIALS_FOR_STREAMLIT_USCGAUX_APP` – service account (path or dict)
   - `LIBRARY_UNIFIED` – Google file ID for accessing the Google Sheet
 5. Select the ui.py file (this is the Streamlit entrypoint)
 6. Go to the "Run and Debug" panel in VS Code (Ctrl+Shift+D or Cmd+Shift+D).
