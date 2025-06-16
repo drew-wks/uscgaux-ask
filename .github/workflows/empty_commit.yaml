@@ -1,0 +1,29 @@
+name: Empty GitHub Commit (triggers Streamlit update)
+# Prevents app from going into inactive mode by making an empty
+# commit, which triggers an update on Streamlit Community Cloud
+
+on:
+  workflow_dispatch: #  Ability to run manually 
+  schedule:
+    - cron: '0 15 * * *'  # Run daily at 3pm
+
+permissions:
+  contents: write
+  
+jobs:
+  Empty_commit_job:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        name: Check out repo
+      - name: Set up Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+      - name: Make Empty Commit
+        run: git commit --allow-empty -m "Empty-Commit"
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
