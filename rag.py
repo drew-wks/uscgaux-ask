@@ -12,7 +12,7 @@ from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_ollama import ChatOllama  # to test other LLMs
 from langchain_core.prompts import ChatPromptTemplate
 from langsmith import traceable  # RAG pipeline instrumentation platform
-from filter_utils import build_retrieval_filter
+from filter_utils import build_retrieval_filter, registry_pdf_id_filter
 from registry import load_registry_and_date
 
 
@@ -223,9 +223,14 @@ def rag(
     }
     
     # build filter (optional) and retriever
-    print (f"Received filter conditions from user: \n{filter_conditions}")
-    retrieval_filter = build_retrieval_filter(filter_conditions)
-    print (f"\nCreated retrieval filter: \n{retrieval_filter}")
+    print(f"Received filter conditions from user: \n{filter_conditions}")
+    registry_df, _ = load_registry_and_date()
+    allowed_ids = registry_pdf_id_filter(registry_df, filter_conditions)
+    retrieval_filter = build_retrieval_filter(
+        filter_conditions,
+        allowed_pdf_ids=allowed_ids,
+    )
+    print(f"\nCreated retrieval filter: \n{retrieval_filter}")
     retriever = get_retriever(retrieval_filter=retrieval_filter).with_config(metadata=CONFIG)
     
     
@@ -240,7 +245,6 @@ def rag(
             return response
 
         # Attach registry metadata based on pdf_id
-        registry_df, _ = load_registry_and_date()
         context = attach_registry_metadata(context, registry_df)
         response["context"] = context
 
