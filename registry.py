@@ -68,7 +68,7 @@ def init_sheets_client(creds: Credentials) -> SheetsClient:
 @st.cache_data
 def load_registry_and_date() -> tuple[pd.DataFrame, str]:
     """
-    Gets the LIBRARY_UNIFIED registry as a DataFrame and the last modified timestamp.
+    Gets the LIBRARY_UNIFIED registry (status=live only) as a DataFrame and the last modified timestamp.
     
     Returns:
         Tuple containing:
@@ -98,6 +98,7 @@ def load_registry_and_date() -> tuple[pd.DataFrame, str]:
         df = pd.DataFrame(rows, columns=headers)
         df = df.loc[:, [col.strip() != "" for col in df.columns]]
         df = df.fillna("").astype(str)
+        df = df[df["status"].str.strip().str.lower() == "live"]
 
         os.write(1, "✅ Fetched and converted worksheet".encode())
         
