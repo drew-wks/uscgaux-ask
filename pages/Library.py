@@ -40,8 +40,9 @@ with tab2:
         st.markdown(f"{num_items} items. Last update: {last_update_date}")  
 
         # Display the DataFrame
-        #display_df = df[['title', 'publication_number', 'organization', 'issue_date', 'expiration_date', 'scope', 'unit']]
-        display_df = df
+        desired_cols = ['title', 'publication_number', 'organization', 'issue_date', 'expiration_date', 'scope', 'unit']
+        available_cols = [col for col in desired_cols if col in df.columns]
+        display_df = df[available_cols]
         edited_df = st.data_editor(display_df, use_container_width=True, hide_index=False, disabled=True)
         isim = f'ASK_catalog_export{last_update_date}.csv'
         indir = edited_df.to_csv(index=False)
