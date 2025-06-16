@@ -105,7 +105,7 @@ def load_registry_and_date() -> tuple[pd.DataFrame, str]:
         file_metadata = drive_client.files().get(
             fileId=spreadsheet_id,
             fields="modifiedTime"
-        ).execute()
+        ).execute() # type: ignore[attr-defined]
         formatted_modified_time = datetime.strptime(file_metadata["modifiedTime"], "%Y-%m-%dT%H:%M:%S.%fZ").strftime("%Y-%m-%dT%H:%M:%SZ")
         return df, formatted_modified_time
 

@@ -42,3 +42,4 @@ def test_ui():
     first_response = at.info[0].value
     assert "Response" in first_response  # Check if the response is shown in the info box
     print("Test completed successfully")
+    

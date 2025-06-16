@@ -10,3 +10,4 @@ ASK is different. It examines the documents themselves, and then uses AI to answ
 
 #### Uses
 You can use ASK to look up programs and competency requirements. For new members, it’s a safe and educational space for questions they may be hesitant to ask in person. Trainees can learn concepts, compare and contrast terms-- even take a quiz with ASK. With an easy-to-use interface, ASK is field-ready. Finally, ASK’s foreign language translation abilities supports language access.
+

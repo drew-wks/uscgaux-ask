@@ -18,3 +18,4 @@ Deeplearning.ai has great [short courses](https://www.deeplearning.ai/short-cour
 ## Credits
 - Background of github avatar Taylor Van Riper taylorvanripen925 under Unsplash image license
 - Suit in image Mary Ellen Matthews, NBC
+- 

@@ -15,3 +15,4 @@ ASK does NOT contain:
 - ALAUX promulgation announcements (since they duplicate the policies themselves and interfere with document retrival)
 - Biographies or points of contact lists
 - Event-related info such as schedules or calendars (e.g., C-School Calendar, NACON schedule)
+- 
