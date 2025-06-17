@@ -1,5 +1,10 @@
 from streamlit.testing.v1 import AppTest
 import time
+import os
+import pytest
+
+if not os.path.exists('.streamlit/secrets.toml'):
+    pytest.skip('Skipping UI test, secrets file not found', allow_module_level=True)
 
 #requries streamlit version >=1.18
     
