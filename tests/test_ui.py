@@ -1,5 +1,12 @@
 from streamlit.testing.v1 import AppTest
 import time
+import pytest
+import streamlit as st
+
+try:
+    _ = st.secrets["QDRANT_URL"]
+except Exception:
+    pytest.skip("Streamlit secrets not configured", allow_module_level=True)
 
 #requries streamlit version >=1.18
     
