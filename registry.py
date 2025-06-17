@@ -6,7 +6,6 @@ import streamlit as st
 from googleapiclient.discovery import build, Resource as DriveClient
 from gspread.client import Client as SheetsClient
 from google.oauth2.service_account import Credentials
-from enum import Enum
 
 
 def get_gcp_credentials() -> Credentials:
@@ -113,92 +112,3 @@ def load_registry_and_date() -> tuple[pd.DataFrame, str]:
     except Exception as e:
         os.write(2, f"❌ [load_registry] Error: {e}".encode())
         return pd.DataFrame(), ""
-
-
-# ---------------------------------------------------------------------------
-# Registry status helpers
-# ---------------------------------------------------------------------------
-
-
-class RegistryStatus(str, Enum):
-    """Enumeration of valid status values for LIBRARY_UNIFIED rows."""
-
-    NEW_FOR_TAGGING = "new_for_tagging"
-    NEW_TAGGED = "new_tagged"
-    LIVE = "live"
-    NEW_FOR_DELETION = "new_for_deletion"
-    LIVE_FOR_ARCHIVE = "live_for_archive"
-    LIVE_FOR_DELETION = "live_for_deletion"
-    ORPHAN_ROW = "orphan_row"
-
-
-@st.cache_data
-def load_full_registry_and_date() -> tuple[pd.DataFrame, str]:
-    """Load the entire LIBRARY_UNIFIED sheet without filtering on ``status``."""
-
-    creds = get_gcp_credentials()
-    spreadsheet_id = st.secrets["LIBRARY_UNIFIED"]
-
-    drive_client = init_drive_client(creds)
-    sheets_client = init_sheets_client(creds)
-
-    try:
-        sheet = sheets_client.open_by_key(spreadsheet_id).sheet1
-        if sheet is None:
-            os.write(2, "❌ Worksheet could not be fetched".encode())
-            return pd.DataFrame(), ""
-
-        raw_data = sheet.get_all_values()
-        if not raw_data or len(raw_data) < 2:
-            os.write(2, "❌ Worksheet has no data rows".encode())
-            return pd.DataFrame(columns=raw_data[0] if raw_data else []), ""
-
-        headers = raw_data[0]
-        rows = raw_data[1:]
-
-        df = pd.DataFrame(rows, columns=headers)
-        df = df.loc[:, [col.strip() != "" for col in df.columns]]
-        df = df.fillna("").astype(str)
-
-        os.write(1, "✅ Fetched and converted worksheet".encode())
-
-        file_metadata = drive_client.files().get(
-            fileId=spreadsheet_id,
-            fields="modifiedTime",
-        ).execute() # type: ignore[attr-defined]
-        formatted_modified_time = datetime.strptime(
-            file_metadata["modifiedTime"], "%Y-%m-%dT%H:%M:%S.%fZ"
-        ).strftime("%Y-%m-%dT%H:%M:%SZ")
-        return df, formatted_modified_time
-
-    except Exception as e:
-        os.write(2, f"❌ [load_registry] Error: {e}".encode())
-        return pd.DataFrame(), ""
-
-
-def filter_registry_by_status(
-    df: pd.DataFrame, statuses: list[RegistryStatus | str] | RegistryStatus | str
-) -> pd.DataFrame:
-    """Return rows from ``df`` matching any of ``statuses``."""
-
-    if "status" not in df.columns:
-        return pd.DataFrame(columns=df.columns)
-
-    if not isinstance(statuses, list):
-        statuses = [statuses]
-
-    status_values = {
-        s.value.lower() if isinstance(s, RegistryStatus) else str(s).lower()
-        for s in statuses
-    }
-    mask = df["status"].str.lower().isin(status_values)
-    return df[mask]
-
-
-def status_counts(df: pd.DataFrame) -> dict[str, int]:
-    """Return a mapping of status value to row count."""
-
-    if "status" not in df.columns:
-        return {}
-    return df["status"].str.lower().value_counts().to_dict()
-
