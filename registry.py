@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 from datetime import datetime
+import json
 import gspread
 import streamlit as st
 from googleapiclient.discovery import build, Resource as DriveClient
@@ -8,15 +9,16 @@ from gspread.client import Client as SheetsClient
 from google.oauth2.service_account import Credentials
 
 
+
 def get_gcp_credentials() -> Credentials:
     """
     Returns a Google `Credentials` object from a flattened JSON string in the environment.
     """
-    creds_dict = st.secrets["GCP_CREDENTIALS_FOR_STREAMLIT_USCGAUX_APP"]
-    if not creds_dict:
+    creds_json = st.secrets["GCP_CREDENTIALS_FOR_STREAMLIT_USCGAUX_APP"]
+    if not creds_json:
         raise EnvironmentError("Missing GCP_CREDENTIALS_FOR_STREAMLIT_USCGAUX_APP in environment.")
-
     try:
+        creds_dict = json.loads(creds_json)
         creds = Credentials.from_service_account_info(creds_dict)
         return creds
     except Exception as e:
@@ -76,7 +78,7 @@ def load_registry_and_date() -> tuple[pd.DataFrame, str]:
             - str: ISO-formatted last modified time (UTC)
     """
     creds = get_gcp_credentials()
-    spreadsheet_id = st.secrets["LIBRARY_UNIFIED"]
+    spreadsheet_id = st.secrets["CATALOG_ID"]
     
     drive_client = init_drive_client(creds)
     sheets_client = init_sheets_client(creds)
