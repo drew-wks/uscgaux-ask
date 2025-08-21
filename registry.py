@@ -70,7 +70,7 @@ def init_sheets_client(creds: Credentials) -> SheetsClient:
 @st.cache_data
 def load_registry_and_date() -> tuple[pd.DataFrame, str]:
     """
-    Gets the LIBRARY_UNIFIED registry (status=live only) as a DataFrame and the last modified timestamp.
+    Gets the CATALOG registry (status=live only) as a DataFrame and the last modified timestamp.
     
     Returns:
         Tuple containing:
@@ -106,7 +106,8 @@ def load_registry_and_date() -> tuple[pd.DataFrame, str]:
         
         file_metadata = drive_client.files().get(
             fileId=spreadsheet_id,
-            fields="modifiedTime"
+            fields="modifiedTime",
+            supportsAllDrives=True,
         ).execute() # type: ignore[attr-defined]
         formatted_modified_time = datetime.strptime(file_metadata["modifiedTime"], "%Y-%m-%dT%H:%M:%S.%fZ").strftime("%Y-%m-%dT%H:%M:%SZ")
         return df, formatted_modified_time

@@ -9,7 +9,6 @@ langsmith # tracing
 qdrant-client   # testing removing this for pydantic issue ==1.6.3
 pandas
 pytest # testing
-openpyxl # used to import the library.xlsx file
 gspread
 google-auth
 google-api-python-client

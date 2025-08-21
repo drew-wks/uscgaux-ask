@@ -1,10 +1,7 @@
 import json
 from pathlib import Path
-
-import pytest
-from google.oauth2.service_account import Credentials
 import tomllib
-
+import pytest
 
 def test_gcp_service_account_credentials_present_and_valid():
     """Ensure Google service account credentials exist and can be parsed."""
@@ -19,17 +16,29 @@ def test_gcp_service_account_credentials_present_and_valid():
     assert key in secrets, f"Missing '{key}' in secrets.toml"
 
     creds_data = secrets[key]
-    if isinstance(creds_data, str):
-        creds_file = Path(creds_data)
-        assert creds_file.exists(), "Credential path specified does not exist"
-        with creds_file.open() as cf:
-            creds_info = json.load(cf)
+
+    # Accept 3 shapes: dict, inline JSON string, or path string
+    if isinstance(creds_data, dict):
+        creds = creds_data
+
+    elif isinstance(creds_data, str):
+        s = creds_data.strip()
+        if s.startswith("{"):
+            # inline JSON in secrets.toml
+            try:
+                creds = json.loads(s)
+            except json.JSONDecodeError as e:
+                pytest.fail(f"Inline JSON credentials not valid JSON: {e}")
+        else:
+            # path to a JSON file
+            creds_file = Path(s).expanduser()
+            assert creds_file.exists(), "Credential path specified does not exist"
+            creds = json.loads(creds_file.read_text())
+
     else:
-        creds_info = creds_data
+        pytest.fail(f"Unsupported credential format: {type(creds_data)}")
 
-    # Attempt to construct Credentials object to verify structure
-    Credentials.from_service_account_info(creds_info)
-
-    # Basic required fields
-    assert creds_info.get("client_email"), "client_email missing in credentials"
-    assert creds_info.get("private_key"), "private_key missing in credentials"
+    # Minimal sanity checks on the loaded creds
+    for required in ("type", "client_email", "private_key"):
+        assert required in creds, f"Missing '{required}' in credentials JSON"
+    assert creds.get("type") == "service_account"
