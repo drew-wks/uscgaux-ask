@@ -4,7 +4,6 @@ import os  # needed for local testing
 import uuid
 from streamlit_feedback import streamlit_feedback
 from langsmith import Client
-from registry import load_registry_and_date
 
 
 
@@ -14,8 +13,9 @@ os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_PROJECT"] = "ui.py on ASK main/cloud" # use this for local testing
 
 
-import rag
-import ui_utils
+from utils.registry import load_registry_and_date
+from utils import rag
+from utils import ui_utils
 import sidebar   
 from streamlit_extras.stylable_container import stylable_container
 from langsmith import traceable

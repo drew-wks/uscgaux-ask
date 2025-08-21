@@ -1,16 +1,24 @@
 import os
 import sys
 import pytest
-import streamlit as st  
+import streamlit as st
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # This uses pytest to test the response quality of the RAG pipeline using ground truth questions. It works however langsmith is so much easier to use.
 
-import ui_utils
-import rag
-from rag import CONFIG
+# Skip tests if required secrets are missing
+required_secrets = ["LANGCHAIN_API_KEY", "QDRANT_URL", "QDRANT_API_KEY", "OPENAI_API_KEY_ASK"]
+try:
+    missing = [s for s in required_secrets if st.secrets.get(s) is None]
+    if missing:
+        pytest.skip(f"Missing Streamlit secrets: {', '.join(missing)}", allow_module_level=True)
+except Exception:
+    pytest.skip("No Streamlit secrets found", allow_module_level=True)
 
+from utils import ui_utils
+from utils import rag
+from utils.rag import CONFIG
 
 # Config Langsmith
 os.environ["LANGCHAIN_API_KEY"] = st.secrets["LANGCHAIN_API_KEY"]

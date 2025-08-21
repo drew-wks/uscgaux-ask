@@ -2,7 +2,7 @@ import os
 import sys
 import streamlit as st
 st.set_page_config(page_title="ASK Auxiliary Source of Knowledge", initial_sidebar_state="collapsed")
-import ui_utils
+from utils import ui_utils
 
 sys.path.insert(0, ui_utils.parent_dir)
 

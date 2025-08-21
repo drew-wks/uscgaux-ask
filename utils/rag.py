@@ -11,8 +11,8 @@ from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_ollama import ChatOllama  # to test other LLMs
 from langchain_core.prompts import ChatPromptTemplate
 from langsmith import traceable  # RAG pipeline instrumentation platform
-from filter_utils import build_retrieval_filter, registry_pdf_id_filter
-from registry import load_registry_and_date
+from .filter import build_retrieval_filter, registry_pdf_id_filter
+from .registry import load_registry_and_date
 
 
 # st.secrets pulls from ~/.streamlit when run locally
@@ -46,7 +46,7 @@ CONFIG = {
     "ASK_temperature": 0.7,
 }
 
-#retrieval filter function is defined in filter_utils.py
+# retrieval filter function is defined in filter.py
 
 
 # Create and cache the document retriever

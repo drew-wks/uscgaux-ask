@@ -3,7 +3,7 @@ import sys
 import pandas as pd
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from filter_utils import registry_pdf_id_filter
+from utils.filter import registry_pdf_id_filter
 
 
 def test_registry_pdf_id_filter_excludes_expired():

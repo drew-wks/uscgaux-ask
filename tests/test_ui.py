@@ -1,11 +1,13 @@
 from streamlit.testing.v1 import AppTest
 import time
+import pytest
+import streamlit as st
 
-#requries streamlit version >=1.18
-    
+# requries streamlit version >=1.18
+
+
 def test_ui():
-    """
-    Test case for the Streamlit user interface I/O using streamlit testing framework AppTest.
+    """Test case for the Streamlit user interface I/O using streamlit testing framework AppTest.
 
     This test performs the following steps:
     1. Initializes the Streamlit app using `AppTest.from_file` with the `ui.py` script.
@@ -27,6 +29,11 @@ def test_ui():
         AssertionError: If any of the steps result in an unexpected outcome or if
                         exceptions occur during app loading or input processing.
     """
+    try:
+        _ = st.secrets["LANGCHAIN_API_KEY"]
+    except Exception:
+        pytest.skip("No Streamlit secrets found", allow_module_level=False)
+
     print("Starting AppTest")
     at = AppTest.from_file("ui.py", default_timeout=5)
     print("Running AppTest")

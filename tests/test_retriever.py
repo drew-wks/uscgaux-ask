@@ -20,7 +20,7 @@ def test_get_retriever_passes_filter(monkeypatch):
         },
     )
 
-    import rag
+    import utils.rag as rag
 
     class DummyStore:
         def __init__(self, client, collection_name, embedding):

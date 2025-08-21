@@ -3,7 +3,7 @@ import uuid
 import streamlit as st
 from streamlit_feedback import streamlit_feedback
 from langsmith import Client
-import rag
+from utils import rag
 
 
 # Config LangSmith if you also want the traces
