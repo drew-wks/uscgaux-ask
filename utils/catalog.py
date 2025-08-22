@@ -70,7 +70,7 @@ def init_sheets_client(creds: Credentials) -> SheetsClient:
 @st.cache_data
 def load_table_and_date(spreadsheet_id) -> tuple[pd.DataFrame, str]:
     """
-    Gets the CATALOG registry (status=live only) as a DataFrame and the last modified timestamp.
+    Gets the CATALOG catalog (status=live only) as a DataFrame and the last modified timestamp.
     
     Returns:
         Tuple containing:

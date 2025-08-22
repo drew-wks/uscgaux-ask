@@ -11,7 +11,7 @@ def build_retrieval_filter(
 ) -> Optional[models.Filter]:
     """Return a Qdrant filter limited to ``pdf_id`` values.
 
-    All other filtering is handled using the registry.
+    All other filtering is handled using the catalog.
     """
 
     must: list[models.FieldCondition] = []
@@ -26,17 +26,17 @@ def build_retrieval_filter(
     return models.Filter(must=must) if must else None
 
 
-def registry_filter(
-    registry_df: pd.DataFrame,
+def catalog_filter(
+    catalog_df: pd.DataFrame,
     filter_conditions: Optional[dict[str, str | bool | None]] = None,
 ) -> List[str]:
-    """Return a list of ``pdf_id`` values from ``registry_df`` that satisfy
+    """Return a list of ``pdf_id`` values from ``catalog_df`` that satisfy
     ``filter_conditions``.
 
     Parameters
     ----------
-    registry_df : pandas.DataFrame
-        Registry data with at least ``pdf_id``, ``scope`` and ``expiration_date``
+    catalog_df : pandas.DataFrame
+        catalog data with at least ``pdf_id``, ``scope`` and ``expiration_date``
         columns.
     filter_conditions : dict, optional
         Same structure as ``build_retrieval_filter`` accepts.
@@ -47,7 +47,7 @@ def registry_filter(
         Unique ``pdf_id`` values matching the filter conditions.
     """
     fc = (filter_conditions or {}).copy()
-    df = registry_df.copy()
+    df = catalog_df.copy()
 
     # Apply boolean flag filters
     for flag in ("public_release", "aux_specific"):

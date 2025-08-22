@@ -1,5 +1,5 @@
 import streamlit as st
-st.set_page_config(page_title="ASK Auxiliary Source of Knowledge", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="ASK Auxiliary Source of Knowledge", initial_sidebar_state="expanded")
 import os  # needed for local testing
 import uuid
 from streamlit_feedback import streamlit_feedback
@@ -13,7 +13,7 @@ os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_PROJECT"] = "ui.py on ASK main/cloud" # use this for local testing
 
 
-from utils.registry import load_table_and_date
+from utils.catalog import load_table_and_date
 from utils import rag
 from utils import ui_utils
 import sidebar   
@@ -33,7 +33,8 @@ else:
 
 
 # Get the library catalog
-df, last_update_date = load_table_and_date()
+spreadsheet_id = st.secrets["CATALOG_ID"]
+df, last_update_date = load_table_and_date(spreadsheet_id)
 num_items = len(df)
 
 

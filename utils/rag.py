@@ -11,8 +11,8 @@ from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_ollama import ChatOllama  # to test other LLMs
 from langchain_core.prompts import ChatPromptTemplate
 from langsmith import traceable  # RAG pipeline instrumentation platform
-from .filter import build_retrieval_filter, registry_filter
-from .registry import (
+from .filter import build_retrieval_filter, catalog_filter
+from .catalog import (
     load_table_and_date,
     get_gcp_credentials,
     init_sheets_client,
@@ -160,25 +160,25 @@ def format_docs(docs):
     return "\n\n".join(doc.page_content for doc in docs)
 
 
-def attach_registry_metadata(docs: List, registry_df: pd.DataFrame) -> List:
-    """Merge registry metadata into each document's metadata using ``pdf_id``.
+def attach_catalog_metadata(docs: List, catalog_df: pd.DataFrame) -> List:
+    """Merge catalog metadata into each document's metadata using ``pdf_id``.
 
     Parameters
     ----------
     docs : list
         Documents returned from Qdrant.
-    registry_df : pandas.DataFrame
-        DataFrame containing registry metadata with a ``pdf_id`` column.
+    catalog_df : pandas.DataFrame
+        DataFrame containing catalog metadata with a ``pdf_id`` column.
 
     Returns
     -------
     list
-        Documents with metadata updated from the registry.
+        Documents with metadata updated from the catalog.
     """
-    if "pdf_id" not in registry_df.columns:
+    if "pdf_id" not in catalog_df.columns:
         return docs
 
-    indexed = registry_df.set_index("pdf_id")
+    indexed = catalog_df.set_index("pdf_id")
     for doc in docs:
         pdf_id = doc.metadata.get("pdf_id")
         if pdf_id and pdf_id in indexed.index:
@@ -246,8 +246,8 @@ def rag(
         catalog_id = st.secrets["CATALOG_ID"]
     except Exception:
         catalog_id = ""
-    registry_df, _ = load_table_and_date(catalog_id) if catalog_id else (pd.DataFrame(), "")
-    allowed_ids = registry_filter(registry_df, filter_conditions)
+    catalog_df, _ = load_table_and_date(catalog_id) if catalog_id else (pd.DataFrame(), "")
+    allowed_ids = catalog_filter(catalog_df, filter_conditions)
     retrieval_filter = build_retrieval_filter(
         filter_conditions,
         allowed_pdf_ids=allowed_ids,
@@ -267,8 +267,8 @@ def rag(
             )
             return response
 
-        # Attach registry metadata based on pdf_id
-        context = attach_registry_metadata(context, registry_df)
+        # Attach catalog metadata based on pdf_id
+        context = attach_catalog_metadata(context, catalog_df)
         response["context"] = context
 
     except Exception as e:
@@ -301,7 +301,7 @@ def rag_for_eval(input: dict) -> dict:
     return {"answer": response["answer"]}
 
 
-def create_source_lists(response, registry_df: pd.DataFrame | None = None):
+def create_source_lists(response, catalog_df: pd.DataFrame | None = None):
     """
     Creates and returns both the short and long source lists as strings.
 
@@ -316,14 +316,14 @@ def create_source_lists(response, registry_df: pd.DataFrame | None = None):
     short_source_markdown_list = []
     long_source_markdown_list = []
 
-    if registry_df is None:
+    if catalog_df is None:
         try:
             catalog_id = st.secrets["CATALOG_ID"]
         except Exception:
             catalog_id = ""
-        registry_df, _ = load_table_and_date(catalog_id) if catalog_id else (pd.DataFrame(), "")
+        catalog_df, _ = load_table_and_date(catalog_id) if catalog_id else (pd.DataFrame(), "")
 
-    indexed = registry_df.set_index("pdf_id") if "pdf_id" in registry_df.columns else None
+    indexed = catalog_df.set_index("pdf_id") if "pdf_id" in catalog_df.columns else None
 
     for i, doc in enumerate(response['context'], start=1):
         pdf_id = doc.metadata.get('pdf_id')
