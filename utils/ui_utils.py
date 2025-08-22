@@ -11,10 +11,10 @@ import re
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-# Hide Streamlit's default UI elements: Main menu, footer, and header
-COLLAPSED_CONTROL = """
-    <style> 
-        [data-testid="collapsedControl"] { display: none } html, body, [class*="st-"] {font-family: "Source Sans Pro", "Arial", "Helvetica", sans-serif !important;}
+# Apply global font styling
+GLOBAL_STYLE = """
+    <style>
+        html, body, [class*="st-"] {font-family: "Source Sans Pro", "Arial", "Helvetica", sans-serif !important;}
     </style>
     """
 
@@ -72,7 +72,7 @@ LOGO = "https://raw.githubusercontent.com/drew-wks/ASK/main/images/ASK_logotype_
 
 
 def apply_styles():
-    st.markdown(COLLAPSED_CONTROL, unsafe_allow_html=True)
+    st.markdown(GLOBAL_STYLE, unsafe_allow_html=True)
     st.markdown(HIDE_STREAMLIT_UI, unsafe_allow_html=True)
     st.markdown(BLOCK_CONTAINER_2, unsafe_allow_html=True)
     st.image(LOGO, use_container_width=True)

@@ -1,5 +1,5 @@
 import streamlit as st
-st.set_page_config(page_title="ASK Auxiliary Source of Knowledge", initial_sidebar_state="expanded")
+st.set_page_config(page_title="ASK Auxiliary Source of Knowledge", initial_sidebar_state="collapsed")
 import os  # needed for local testing
 import uuid
 from streamlit_feedback import streamlit_feedback
