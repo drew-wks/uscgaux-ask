@@ -13,7 +13,7 @@ os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_PROJECT"] = "ui.py on ASK main/cloud" # use this for local testing
 
 
-from utils.registry import load_registry_and_date
+from utils.registry import load_table_and_date
 from utils import rag
 from utils import ui_utils
 import sidebar   
@@ -33,7 +33,7 @@ else:
 
 
 # Get the library catalog
-df, last_update_date = load_registry_and_date()
+df, last_update_date = load_table_and_date()
 num_items = len(df)
 
 

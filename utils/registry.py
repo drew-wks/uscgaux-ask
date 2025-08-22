@@ -68,7 +68,7 @@ def init_sheets_client(creds: Credentials) -> SheetsClient:
 
 
 @st.cache_data
-def load_registry_and_date() -> tuple[pd.DataFrame, str]:
+def load_table_and_date(spreadsheet_id) -> tuple[pd.DataFrame, str]:
     """
     Gets the CATALOG registry (status=live only) as a DataFrame and the last modified timestamp.
     
@@ -78,8 +78,6 @@ def load_registry_and_date() -> tuple[pd.DataFrame, str]:
             - str: ISO-formatted last modified time (UTC)
     """
     creds = get_gcp_credentials()
-    spreadsheet_id = st.secrets["CATALOG_ID"]
-    
     drive_client = init_drive_client(creds)
     sheets_client = init_sheets_client(creds)
     
@@ -113,5 +111,5 @@ def load_registry_and_date() -> tuple[pd.DataFrame, str]:
         return df, formatted_modified_time
 
     except Exception as e:
-        os.write(2, f"❌ [load_registry] Error: {e}".encode())
+        os.write(2, f"❌ [load_table] Error: {e}".encode())
         return pd.DataFrame(), ""

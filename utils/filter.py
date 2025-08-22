@@ -26,7 +26,7 @@ def build_retrieval_filter(
     return models.Filter(must=must) if must else None
 
 
-def registry_pdf_id_filter(
+def registry_filter(
     registry_df: pd.DataFrame,
     filter_conditions: Optional[dict[str, str | bool | None]] = None,
 ) -> List[str]:

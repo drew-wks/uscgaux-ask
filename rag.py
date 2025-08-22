@@ -11,8 +11,9 @@ from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_ollama import ChatOllama  # to test other LLMs
 from langchain_core.prompts import ChatPromptTemplate
 from langsmith import traceable  # RAG pipeline instrumentation platform
-from .filter import build_retrieval_filter, registry_filter
-from .registry import load_table_and_date
+
+from utils.filter import build_retrieval_filter, registry_filter
+from utils.registry import load_table_and_date
 
 
 # st.secrets pulls from ~/.streamlit when run locally
@@ -46,7 +47,7 @@ CONFIG = {
     "ASK_temperature": 0.7,
 }
 
-# retrieval filter function is defined in filter.py
+#retrieval filter function is defined in utils.filter.py
 
 
 # Create and cache the document retriever
@@ -80,11 +81,12 @@ def get_retriever(retrieval_filter: Optional[models.Filter]):
 
 # Cache data retrieval function
 #@st.cache_data
-def get_retrieval_context(file_path: str):
-    '''Reads the worksheets Excel file into a dictionary of dictionaries.'''
+def get_retrieval_context(spreadsheet_id):
+    '''Reads the Google worksheet into a dictionary of dictionaries.'''
     context_dict = {}
-    for sheet_name in pd.ExcelFile(file_path).sheet_names:
-        df = pd.read_excel(file_path, sheet_name=sheet_name)
+    retrieval_context, _ = load_table_and_date(spreadsheet_id)
+    for sheet_name in retrieval_context.sheet_names:
+        df = pd.retrieval_context(sheet_name=sheet_name)
         if df.shape[1] >= 2:
             context_dict[sheet_name] = pd.Series(
                 df.iloc[:, 1].values, index=df.iloc[:, 0]).to_dict()
@@ -223,7 +225,8 @@ def rag(
     
     # build filter (optional) and retriever
     print(f"Received filter conditions from user: \n{filter_conditions}")
-    registry_df, _ = load_table_and_date()
+    spreadsheet_id = st.secrets["CATALOG_ID"]
+    registry_df, _ = load_table_and_date(spreadsheet_id)
     allowed_ids = registry_filter(registry_df, filter_conditions)
     retrieval_filter = build_retrieval_filter(
         filter_conditions,
