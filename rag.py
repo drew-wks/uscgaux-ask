@@ -13,7 +13,11 @@ from langchain_core.prompts import ChatPromptTemplate
 from langsmith import traceable  # RAG pipeline instrumentation platform
 
 from utils.filter import build_retrieval_filter, registry_filter
-from utils.registry import load_table_and_date
+from utils.registry import (
+    load_table_and_date,
+    get_gcp_credentials,
+    init_sheets_client,
+)
 
 
 # st.secrets pulls from ~/.streamlit when run locally
@@ -81,21 +85,31 @@ def get_retriever(retrieval_filter: Optional[models.Filter]):
 
 # Cache data retrieval function
 #@st.cache_data
-def get_retrieval_context(spreadsheet_id):
-    '''Reads the Google worksheet into a dictionary of dictionaries.'''
-    context_dict = {}
-    retrieval_context, _ = load_table_and_date(spreadsheet_id)
-    for sheet_name in retrieval_context.sheet_names:
-        df = pd.retrieval_context(sheet_name=sheet_name)
+def get_retrieval_context(spreadsheet_id: str) -> dict:
+    """Reads a Google Sheet and returns a dictionary for each worksheet.
+
+    Each worksheet within the Google Sheet is converted into a dictionary
+    where keys come from the first column and values from the second column.
+    """
+    context_dict: dict[str, dict] = {}
+
+    creds = get_gcp_credentials()
+    sheets_client = init_sheets_client(creds)
+    workbook = sheets_client.open_by_key(spreadsheet_id)
+
+    for worksheet in workbook.worksheets():
+        values: list[list[str]] = worksheet.get_all_values()
+        if len(values) < 2 or len(values[0]) < 2:
+            continue
+
+        df = pd.DataFrame(values[1:], columns=values[0])  # type: ignore[arg-type]
         if df.shape[1] >= 2:
-            context_dict[sheet_name] = pd.Series(
-                df.iloc[:, 1].values, index=df.iloc[:, 0]).to_dict()
+            context_dict[worksheet.title] = pd.Series(
+                df.iloc[:, 1].values, index=df.iloc[:, 0]
+            ).to_dict()
+
     return context_dict
 
-
-
-# Path to prompt enrichment dictionaries
-enrichment_path = os.path.join(os.path.dirname(__file__), 'config/retrieval_context.xlsx')
 
 
 # Define the enrichment function.
@@ -103,8 +117,16 @@ enrichment_path = os.path.join(os.path.dirname(__file__), 'config/retrieval_cont
 # cache_data decorator is used to cache the function in Streamlit
 @traceable(run_type="prompt")
 #@st.cache_data
-def enrich_question(user_question: str, filepath=enrichment_path) -> str:
-    enrichment_dict = get_retrieval_context(filepath)
+def enrich_question(user_question: str, spreadsheet_id: str | None = None) -> str:
+    if spreadsheet_id is None:
+        try:
+            spreadsheet_id = st.secrets["ENRICHMENT_SPREADSHEET_ID"]
+        except Exception:
+            spreadsheet_id = ""
+
+    enrichment_dict = (
+        get_retrieval_context(spreadsheet_id) if spreadsheet_id else {}
+    )
     acronyms_dict = enrichment_dict.get("acronyms", {})
     terms_dict = enrichment_dict.get("terms", {})
 
@@ -237,6 +259,7 @@ def rag(
     
     
     # Retrieve relevant documents using the enriched question
+    context: list = []
     try:
         context = retriever.invoke(enriched_question)
         print(f"\n📄 Retrieved context: {len(context)} documents")
@@ -296,7 +319,11 @@ def create_source_lists(response, registry_df: pd.DataFrame | None = None):
     long_source_markdown_list = []
 
     if registry_df is None:
-        registry_df, _ = load_table_and_date()
+        try:
+            catalog_id = st.secrets["CATALOG_ID"]
+        except Exception:
+            catalog_id = ""
+        registry_df, _ = load_table_and_date(catalog_id) if catalog_id else (pd.DataFrame(), "")
 
     indexed = registry_df.set_index("pdf_id") if "pdf_id" in registry_df.columns else None
 
