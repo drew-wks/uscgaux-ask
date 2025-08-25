@@ -11,7 +11,7 @@ def build_sidebar():
     
     include_d7      = st.sidebar.checkbox("Include District 7 documents in results")
     
-    exclude_expired = st.sidebar.checkbox("Exclude expired documents", value=False)
+    exclude_expired = st.sidebar.checkbox("Exclude expired documents", value=True)
     st.sidebar.caption("This excludes all Commandant Instructions issued more than 12 years ago (including AUXMAN) as well as ALCOASTs and ALAUXs issued more than one year ago, per COMDTINST 5215.6J.\n\n")
 
     filter_conditions = {"public_release": True}

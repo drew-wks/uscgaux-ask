@@ -90,7 +90,6 @@ def initialize_session_states():
         st.session_state.filter_conditions = {}
 
 initialize_session_states()
-
 st.session_state["filter_conditions"] = sidebar.build_sidebar()
 
 
