@@ -19,7 +19,7 @@ HIDE_STREAMLIT_UI = """
     <style>
         #MainMenu {visibility: hidden;}
         footer {visibility: hidden;}
-        div[data-testid="stToolbar"] {visibility: hidden;}
+        header {visibility: hidden;}
     </style>
     """
 
