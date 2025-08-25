@@ -1,11 +1,7 @@
 import os  # needed for local testing
-import datetime
 import requests
-import streamlit as st 
-import pandas as pd
+import streamlit as st
 from pathlib import Path
-from fnmatch import fnmatch
-import re
 
 
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -18,11 +14,12 @@ GLOBAL_STYLE = """
     </style>
     """
 
+# Hide Streamlit's default UI elements while preserving sidebar toggle
 HIDE_STREAMLIT_UI = """
     <style>
         #MainMenu {visibility: hidden;}
         footer {visibility: hidden;}
-        header {visibility: hidden;}
+        div[data-testid="stToolbar"] {visibility: hidden;}
     </style>
     """
 
@@ -80,27 +77,35 @@ def apply_styles():
 
 @st.cache_data
 def get_openai_api_status():
-    '''Notify user if OpenAI is down so they don't blame the app'''
+    """Notify user if OpenAI is down so they don't blame the app"""
 
-    components_url = 'https://status.openai.com/api/v2/components.json'
-    status_message = ''
+    components_url = "https://status.openai.com/api/v2/components.json"
+    status_message = ""
 
     try:
         response = requests.get(components_url, timeout=10)
         # Raises an HTTPError if the HTTP request returned an unsuccessful status code
         response.raise_for_status()
         components_info = response.json()
-        components = components_info.get('components', [])
+        components = components_info.get("components", [])
 
         # Find the component that represents the API
         chat_component = next(
-            (component for component in components if component.get('name', '').lower() == 'chat'), 
-            None
+            (
+                component
+                for component in components
+                if component.get("name", "").lower() == "chat"
+            ),
+            None,
         )
-            
+
         if chat_component:
-            status_message = chat_component.get('status', 'unknown')
-            return f"ChatGPT API status: {status_message}" if status_message != 'operational' else "ChatGPT API is operational"
+            status_message = chat_component.get("status", "unknown")
+            return (
+                f"ChatGPT API status: {status_message}"
+                if status_message != "operational"
+                else "ChatGPT API is operational"
+            )
         else:
             return "ChatGPT API component not found"
 
@@ -118,11 +123,10 @@ def get_markdown(markdown_file):
     return Path(markdown_file).read_text()
 
 
-
 def main():
     print("Running utils.py directly")
     # You can include test code for utility functions here, if desired
 
+
 if __name__ == "__main__":
     main()
-    
