@@ -7,19 +7,22 @@ from pathlib import Path
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-# Apply global font styling
+# Apply global font styling, except to icon class
 GLOBAL_STYLE = """
-    <style>
-        html, body, [class*="st-"] {font-family: "Source Sans Pro", "Arial", "Helvetica", sans-serif !important;}
-    </style>
-    """
-
+<style>
+  html, body {
+    font-family: "Material Symbols Outlined", "Material Icons",
+                 "Source Sans Pro", "Arial", "Helvetica", sans-serif;
+  }
+</style>
+"""
 # Hide Streamlit's default UI elements while preserving sidebar toggle
+
 HIDE_STREAMLIT_UI = """
     <style>
         #MainMenu {visibility: hidden;}
         footer {visibility: hidden;}
-        header {visibility: hidden;}
+        header {visibility: visible;}
     </style>
     """
 
@@ -122,11 +125,3 @@ def get_openai_api_status():
 def get_markdown(markdown_file):
     return Path(markdown_file).read_text()
 
-
-def main():
-    print("Running utils.py directly")
-    # You can include test code for utility functions here, if desired
-
-
-if __name__ == "__main__":
-    main()
