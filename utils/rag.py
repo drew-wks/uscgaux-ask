@@ -11,9 +11,8 @@ from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_ollama import ChatOllama  # to test other LLMs
 from langchain_core.prompts import ChatPromptTemplate
 from langsmith import traceable  # RAG pipeline instrumentation platform
-
-from utils.filter import build_retrieval_filter, catalog_filter
-from utils.catalog import (
+from .filter import build_retrieval_filter, catalog_filter
+from .catalog import (
     load_table_and_date,
     get_gcp_credentials,
     init_sheets_client,
@@ -51,7 +50,7 @@ CONFIG = {
     "ASK_temperature": 0.7,
 }
 
-#retrieval filter function is defined in utils.filter.py
+# retrieval filter function is defined in filter.py
 
 
 # Create and cache the document retriever
@@ -86,11 +85,7 @@ def get_retriever(retrieval_filter: Optional[models.Filter]):
 # Cache data retrieval function
 #@st.cache_data
 def get_retrieval_context(spreadsheet_id: str) -> dict:
-    """Reads a Google Sheet and returns a dictionary for each worksheet.
-
-    Each worksheet within the Google Sheet is converted into a dictionary
-    where keys come from the first column and values from the second column.
-    """
+    """Reads a Google Sheet and returns a dictionary for each worksheet."""
     context_dict: dict[str, dict] = {}
 
     creds = get_gcp_credentials()
@@ -247,8 +242,11 @@ def rag(
     
     # build filter (optional) and retriever
     print(f"Received filter conditions from user: \n{filter_conditions}")
-    spreadsheet_id = st.secrets["CATALOG_ID"]
-    catalog_df, _ = load_table_and_date(spreadsheet_id)
+    try:
+        catalog_id = st.secrets["CATALOG_ID"]
+    except Exception:
+        catalog_id = ""
+    catalog_df, _ = load_table_and_date(catalog_id) if catalog_id else (pd.DataFrame(), "")
     allowed_ids = catalog_filter(catalog_df, filter_conditions)
     retrieval_filter = build_retrieval_filter(
         filter_conditions,
