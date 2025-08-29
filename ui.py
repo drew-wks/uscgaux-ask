@@ -118,6 +118,18 @@ if st.session_state.get("response"):
     response = st.session_state["response"]
     short_source_list, long_source_list = rag.create_source_lists(response)
     example_questions.empty()  
+    # Show active filter summary chip above results
+    fc = st.session_state.get("filter_conditions", {}) or {}
+    scope = str(fc.get("scope", "National")).strip()
+    units = fc.get("units", []) or []
+    units_label = ", ".join(units) if units else ("All" if scope in ("District", "Both") else "—")
+    chip_html = f"""
+        <div style='display:inline-block;padding:6px 10px;border-radius:16px;background:#eef2ff;color:#3730a3;font-size:12px;margin-bottom:8px;'>
+            Scope: <b>{scope}</b>{' · Districts: ' + units_label if scope in ('District','Both') else ''}
+        </div>
+    """
+    st.markdown(chip_html, unsafe_allow_html=True)
+
     st.info(f"**Question:** *{user_question}*\n\n ##### Response:\n{response['answer']}\n\n **Sources:**  \n{short_source_list}\n **Note:** \n ASK can make mistakes. Verify the sources and check your local policies.")
     print("📫  Response delivered to user")
 

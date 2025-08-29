@@ -205,7 +205,7 @@ class AnswerWithSources(TypedDict):
 def rag(
     user_question: str,
     timeout: int = 60,
-    filter_conditions: Optional[dict[str, str | bool | None]] = None,
+    filter_conditions: Optional[dict[str, str | bool | None | list[str]]] = None,
     langsmith_extra: Optional[dict] = None,
 ) -> dict:
     "accepts user_question and an optional filter"
@@ -352,4 +352,3 @@ def create_source_lists(response, catalog_df: pd.DataFrame | None = None):
     long_source_list = '  \n'.join(long_source_markdown_list)
     
     return short_source_list, long_source_list
-

@@ -13,6 +13,9 @@ gspread
 google-auth
 google-api-python-client
 requests==2.32.3 #  for GitHub Actions. used to access qdrant
+
+# External merged schema provider for ASK UI
+git+https://github.com/drew-wks/uscgaux.git@main#egg=uscgaux
 selenium==4.25 #  for GitHub Actions. needed to check for app Streamlit suspension due to inactivity
 streamlit_extras
 streamlit_feedback 
@@ -20,5 +23,4 @@ tiktoken # not sure this is being used
 webdriver-manager==4.0.2  #  for GitHub Actions. Check for Streamlit app suspension due to inactivity
 
 # git+https://github.com/drew-wks/uscgaux.git@main#egg=uscgaux
-
 
