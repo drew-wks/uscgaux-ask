@@ -288,7 +288,7 @@ def rag(
         print("🧠 Received LLM response")
     except Exception as e:
         print(f"LLM Error: {e}")
-        response["answer"] = f"⚠️ There was a problem generating a response: {e}",
+        response["answer"] = f"⚠️ There was a problem generating a response: {e}"
     return response
 
 

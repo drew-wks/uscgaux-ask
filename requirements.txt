@@ -8,7 +8,7 @@ langchain-ollama
 langsmith # tracing
 qdrant-client   # testing removing this for pydantic issue ==1.6.3
 pandas
-pytest # testing
+
 gspread
 google-auth
 google-api-python-client
