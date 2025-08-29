@@ -62,4 +62,4 @@ def check_app_status(url):
         driver.quit()
 
 # Run the check
-check_app_status(st.secrets["END_USER_APP_NAME"])
+check_app_status(st.secrets["APP_URL"])
