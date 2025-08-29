@@ -90,7 +90,11 @@ Efforts were taken to free up as much screen real estate as possible for small m
   - Adjustments to page header and footer
   - Replacing Streamlit header with st.status
   - Removing instructional text after query is submitted to make room for response (using st.empty)
-    
+
+Automation
+-   Automated jobs for streamlit Community Cloud and qdrant Free Tier keep resources alive. 
+-   NOTE: Must be enabbled in GitHub Actions. Also GitHub does not run scheduled workflows in forks. 
+
 Other features  
   - OpenAI down triggers a user warning
   - Warning is displayed if OpenAI quota is exceeded and I need to pay for more credits

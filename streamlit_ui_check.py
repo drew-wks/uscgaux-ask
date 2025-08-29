@@ -3,6 +3,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 import time
+import streamlit as st
 
 
 def check_app_status(url):
@@ -48,9 +49,9 @@ def check_app_status(url):
 
         # Check for specific strings and print the found text
         if "Hosted with Streamlit" in page_text:
-            print("App is working: 'Hosted with Streamlit'")
+            print("🎉 Yay! App is working: 'Hosted with Streamlit'")
         elif "Zzzz" in page_text:
-            print("App is down: 'Zzzz'")
+            print("⚠️ App is down: 'Zzzz'")
         else:
             print("Text found on the page:")
             print(page_text)
@@ -61,4 +62,4 @@ def check_app_status(url):
         driver.quit()
 
 # Run the check
-check_app_status('https://uscg-auxiliary-ask.streamlit.app/')
+check_app_status(st.secrets["END_USER_APP_NAME"])
