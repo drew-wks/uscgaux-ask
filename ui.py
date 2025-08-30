@@ -1,5 +1,6 @@
 import os  # needed for local testing
 import uuid
+import pandas as pd
 import streamlit as st
 
 st.set_page_config(page_title="ASK Auxiliary Source of Knowledge", initial_sidebar_state="collapsed")
@@ -15,15 +16,16 @@ os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_PROJECT"] = "ui.py on ASK main/cloud" # use this for local testing
 
 
-from utils.backends_bridge import load_table_and_date
+from utils.backends_bridge import get_backend_container, fetch_table_and_date
 from utils import rag
 from uscgaux import stui, stu
-
 import sidebar   
+
+stui.apply_ui_styles()
 
 from langsmith import traceable
 
-stui.apply_ui_styles()
+
 
 
 # Check Open AI service status
@@ -33,9 +35,19 @@ if "operational" not in api_status_message:
 else: 
     st.write("#### Get answers to USCG Auxiliary questions from authoritative sources.")
 
+# Ensure variables exist even if initialization fails
+df: pd.DataFrame = pd.DataFrame()
+last_update_date: str = ""
 
-# Get the library catalog via provider adapters
-df, last_update_date = load_table_and_date()
+try:
+    backend_connectors = get_backend_container()
+    df, last_update_date = fetch_table_and_date(backend_connectors)
+except Exception as exc:
+    import logging
+    logging.getLogger(__name__).exception("Backend init/fetch failed")
+    st.error("ASK is currently unavailable due to a dependency issue. Please try again later.")
+    # Fallback to empty catalog so downstream code can render
+
 num_items = len(df)
 
 
