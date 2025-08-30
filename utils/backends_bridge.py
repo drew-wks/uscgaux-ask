@@ -3,11 +3,8 @@ from __future__ import annotations
 import json
 import logging
 from typing import Any, Tuple, Optional
-
-import gspread
 import pandas as pd
 import streamlit as st
-from google.oauth2.service_account import Credentials
 
 
 from uscgaux import stu
@@ -20,32 +17,6 @@ if not logger.handlers:
     logging.basicConfig(level=logging.INFO)
 
 
-
-def get_gcp_credentials() -> Credentials:
-    """Build Google credentials from a flattened JSON in Streamlit secrets.
-
-    Returns
-    -------
-    google.oauth2.service_account.Credentials
-        Service account credentials for Google APIs.
-    """
-    creds_json = st.secrets["GCP_CREDENTIALS_FOR_STREAMLIT_USCGAUX_APP"]
-    if not creds_json:
-        msg = "Missing GCP_CREDENTIALS_FOR_STREAMLIT_USCGAUX_APP in environment."
-        logger.error(msg)
-        raise EnvironmentError(msg)
-    try:
-        creds_dict = json.loads(creds_json)
-        creds = Credentials.from_service_account_info(creds_dict)
-        return creds
-    except Exception as exc:  # noqa: BLE001
-        logger.exception("Failed to load GCP credentials from environment")
-        raise ValueError(f"Failed to load GCP credentials from environment: {exc}") from exc
-    
-
-
-
-# --- Backend container (uscgaux) -------------------------------------------------
 
 @st.cache_resource(show_spinner=True)
 def get_backend_container() -> BackendContainer:
@@ -71,7 +42,6 @@ def get_backend_container() -> BackendContainer:
     except Exception:
         logger.exception("BackendContainer unavailable (uscgaux required).")
         st.error("⚠️ Could not initialize backends. See logs for details.")
-        st.stop()  # NoReturn
 
 
 
