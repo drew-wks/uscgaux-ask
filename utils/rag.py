@@ -53,7 +53,7 @@ CONFIG = {
 # retrieval filter function is defined in filter.py
 
 
-def get_retriever_new(retrieval_filter: Optional[models.Filter]):
+def get_retriever(retrieval_filter: Optional[models.Filter]):
     '''Creates and caches the document retriever and Qdrant client with optional filters.'''
     
     backend_connectors = get_backend_container()
@@ -69,7 +69,7 @@ def get_retriever_new(retrieval_filter: Optional[models.Filter]):
 
 # Create and cache the document retriever
 #@st.cache_resource
-def get_retriever(retrieval_filter: Optional[models.Filter]):
+def get_retriever_old(retrieval_filter: Optional[models.Filter]):
     '''Creates and caches the document retriever and Qdrant client with optional filters.'''
 
 

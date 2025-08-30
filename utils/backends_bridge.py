@@ -1,14 +1,13 @@
 from __future__ import annotations
 
 import logging
-from typing import Tuple
 import pandas as pd
 import streamlit as st
 
 
 from uscgaux import stu
 from uscgaux.config.loader import load_config_by_context
-from uscgaux.backends import BackendContainer, 
+from uscgaux.backends import BackendContainer
 
 
 logger = logging.getLogger(__name__)
@@ -41,11 +40,12 @@ def get_backend_container() -> BackendContainer:
     except Exception:
         logger.exception("BackendContainer unavailable (uscgaux required).")
         st.error("⚠️ Could not initialize backends. See logs for details.")
+        st.stop()  # NoReturn: ensure no None return paths
 
 
 
 @st.cache_data(show_spinner=False, hash_funcs={BackendContainer: lambda obj: f"BackendContainer-{id(obj)}"})
-def fetch_table_and_date(backend_connectors: BackendContainer) -> Tuple[pd.DataFrame, str]:
+def fetch_table_and_date(backend_connectors: BackendContainer) -> tuple[pd.DataFrame, str]:
     """Return the catalog DataFrame and its last modified timestamp.
 
      This helper relies on the active ``CatalogConnector`` provided by the
@@ -85,4 +85,3 @@ def fetch_table_and_date(backend_connectors: BackendContainer) -> Tuple[pd.DataF
     logger.info("✅ Catalog successfully fetched")
     
     return st_df, modified_time
-
