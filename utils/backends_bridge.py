@@ -62,29 +62,6 @@ def init_drive_client(creds: Credentials) -> DriveClient:
     logger.info("Google Drive client initialized with scoped credentials")
     return client
 
-    
-def init_sheets_client(creds: Credentials) -> gspread.client.Client:
-    """Initialize a Google Sheets client with the given credentials.
-
-    Parameters
-    ----------
-    creds : Credentials
-        Google service account or user credentials.
-
-    Returns
-    -------
-    gspread.client.Client
-        Authorized gspread client for Google Sheets.
-    """
-    scoped_creds = creds.with_scopes(
-        [
-            "https://spreadsheets.google.com/feeds",
-            "https://www.googleapis.com/auth/drive",
-        ]
-    )
-    client = gspread.authorize(scoped_creds)
-    logger.info("Google Sheets client initialized with scoped credentials")
-    return client
 
 
 # --- Backend container (uscgaux) -------------------------------------------------

@@ -4,8 +4,8 @@ import os  # needed for local testing
 import sys
 import streamlit as st
 st.set_page_config(page_title="ASK Auxiliary Source of Knowledge", initial_sidebar_state="collapsed")
-from utils.backends_bridge import load_table_and_date
-from uscgaux import stui, stu
+from utils.backends_bridge import get_backend_container, fetch_table_and_date
+from uscgaux import stui
 
 
 stui.apply_ui_styles()
@@ -25,7 +25,8 @@ with tab1:
 
 with tab2:
     try:
-        df, last_update_date = load_table_and_date()
+        backend_connectors = get_backend_container()
+        df, last_update_date = fetch_table_and_date(backend_connectors)
     except Exception:
         st.error("Library is unavailable due to a dependency issue. Please try again later.")
         df, last_update_date = (None, "")

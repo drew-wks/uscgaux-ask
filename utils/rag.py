@@ -14,8 +14,6 @@ from langchain_core.prompts import ChatPromptTemplate
 from langsmith import traceable  # RAG pipeline instrumentation platform
 from .filter import build_retrieval_filter, catalog_filter
 from .backends_bridge import (
-    get_gcp_credentials,
-    init_sheets_client,
     get_backend_container,
     fetch_table_and_date
 )
@@ -84,32 +82,6 @@ def get_retriever(retrieval_filter: Optional[models.Filter]):
 
 
 
-# Cache data retrieval function
-#@st.cache_data
-def get_retrieval_context(spreadsheet_id: str) -> dict:
-    """Reads a Google Sheet and returns a dictionary for each worksheet."""
-    context_dict: dict[str, dict] = {}
-
-    creds = get_gcp_credentials()
-    sheets_client = init_sheets_client(creds)
-    workbook = sheets_client.open_by_key(spreadsheet_id)
-
-    for worksheet in workbook.worksheets():
-        values: list[list[str]] = worksheet.get_all_values()
-        if len(values) < 2 or len(values[0]) < 2:
-            continue
-
-        df = pd.DataFrame(values[1:], columns=values[0])  # type: ignore[arg-type]
-        if df.shape[1] >= 2:
-            context_dict[worksheet.title] = pd.Series(
-                df.iloc[:, 1].values, index=df.iloc[:, 0]
-            ).to_dict()
-
-    return context_dict
-
-
-# Path to prompt enrichment dictionaries (project-level `config` directory)
-# Resolve base directory as the repository root relative to this file
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 ACRONYMS_PATH = os.path.join(BASE_DIR, 'config', 'acronyms.csv')
 TERMS_PATH = os.path.join(BASE_DIR, 'config', 'terms.csv')
