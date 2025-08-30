@@ -53,6 +53,20 @@ CONFIG = {
 # retrieval filter function is defined in filter.py
 
 
+def get_retriever_new(retrieval_filter: Optional[models.Filter]):
+    '''Creates and caches the document retriever and Qdrant client with optional filters.'''
+    
+    backend_connectors = get_backend_container()
+    qdrant = backend_connectors.vectordb.get_langchain_vectorstore()
+
+    retriever = qdrant.as_retriever(
+    search_type=CONFIG["ASK_search_type"],
+    search_kwargs={'k': CONFIG["ASK_k"], "fetch_k": CONFIG["ASK_fetch_k"],
+                    "lambda_mult": CONFIG["ASK_lambda_mult"], "filter": retrieval_filter},  # If None, no metadata filering occurs
+    )
+    return retriever
+
+
 # Create and cache the document retriever
 #@st.cache_resource
 def get_retriever(retrieval_filter: Optional[models.Filter]):

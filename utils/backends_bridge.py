@@ -8,7 +8,7 @@ import streamlit as st
 
 from uscgaux import stu
 from uscgaux.config.loader import load_config_by_context
-from uscgaux.backends import BackendContainer
+from uscgaux.backends import BackendContainer, 
 
 
 logger = logging.getLogger(__name__)
@@ -32,7 +32,7 @@ def get_backend_container() -> BackendContainer:
     config = load_config_by_context()
     
     try:
-        *_, backend_connectors = stu.cached_init_connectors(config)
+        backend_connectors = stu.cached_init_connectors(config)[-1]
         if backend_connectors is None:  # defensive: avoid caching a bad init
             logger.error("stu.cached_init_connectors returned None; stopping initialization")
             st.error("⚠️ Could not initialize backends. See logs for details.")
@@ -85,3 +85,4 @@ def fetch_table_and_date(backend_connectors: BackendContainer) -> Tuple[pd.DataF
     logger.info("✅ Catalog successfully fetched")
     
     return st_df, modified_time
+
