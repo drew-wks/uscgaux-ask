@@ -24,7 +24,7 @@ def build_sidebar():
     #    "#### Experimental\n\n  The following features are experimental and may not work as # expected.\n\n"
     #)
 
-    # Scope selection
+    # Scope selection derived from shared schema when available
     default_scopes: List[str]
     if get_allowed_values is not None:
         try:
@@ -35,8 +35,10 @@ def build_sidebar():
     else:
         default_scopes = ["National", "District"]
 
-    # Add the combined option
-    scope_options = ["National", "District", "Both"]
+    # Build options from schema and include a combined option "Both"
+    # Fallback to known values if schema is unavailable/empty
+    base_opts = default_scopes if default_scopes else ["National", "District"]
+    scope_options = list(dict.fromkeys([*base_opts, "Both"]))
     # Radio defaults to National
     scope_choice = st.sidebar.radio(
         "Include documents at the following levels:", options=scope_options, index=0, horizontal=False
