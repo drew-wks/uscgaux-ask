@@ -1,0 +1,2 @@
+[MASTER]
+init-hook="import sys; sys.path.append('/Users/drew_wilkins/Drews_Files/Drew/Python/Repositories/uscgaux')"

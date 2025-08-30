@@ -4,15 +4,12 @@ import os  # needed for local testing
 import sys
 import streamlit as st
 st.set_page_config(page_title="ASK Auxiliary Source of Knowledge", initial_sidebar_state="collapsed")
-import pandas as pd
 from utils.catalog import load_table_and_date
-from utils import ui_utils
+from uscgaux import streamlit_ui_utils as stui
+from uscgaux import streamlit_utils as stu 
 
 
-sys.path.insert(0, ui_utils.parent_dir)
-
-
-ui_utils.apply_styles()
+stui.apply_ui_styles()
 
 
 back = st.button("< Back to App", type="primary")
@@ -23,13 +20,13 @@ if back:
 tab1, tab2, tab3, tab4, tab5 = st.tabs(["Overview", "Library", "FAQs", "Product Roadmap", "Feedback"])
 
 with tab1:
-    overview = ui_utils.get_markdown("docs/ask_overview.md")
+    overview = stui.get_markdown("docs/ask_overview.md")
     st.markdown(overview, unsafe_allow_html=True)
     
 
 with tab2:
     df, last_update_date = load_table_and_date()
-    overview = ui_utils.get_markdown("docs/library_overview.md")
+    overview = stui.get_markdown("docs/library_overview.md")
 
     if df is not None:
         num_items = len(df)
@@ -52,16 +49,16 @@ with tab2:
 
     else:
         # Display the original markdown file content if df is None
-        overview = ui_utils.get_markdown("docs/library_overview.md")
+        overview = stui.get_markdown("docs/library_overview.md")
         st.markdown(overview, unsafe_allow_html=True)
 
 
 with tab3:
-    overview = ui_utils.get_markdown("docs/faqs.md")
+    overview = stui.get_markdown("docs/faqs.md")
     st.markdown(overview, unsafe_allow_html=True)
 
 with tab4:
-    roadmap = ui_utils.get_markdown("docs/roadmap.md")
+    roadmap = stui.get_markdown("docs/roadmap.md")
     st.markdown(roadmap, unsafe_allow_html=True)
     
     
@@ -79,4 +76,4 @@ with tab5:
     st.markdown('Send an email to uscgaux.drew@wks.us.''')
     
 
-st.markdown(ui_utils.FOOTER, unsafe_allow_html=True) 
+st.markdown(stui.FOOTER, unsafe_allow_html=True) 

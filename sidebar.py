@@ -1,12 +1,8 @@
 # sidebar.py
-import streamlit as st
-from utils import ui_utils
 from typing import List
-try:
-    # External stable API for allowed values
-    from uscgaux import get_allowed_values
-except Exception:  # pragma: no cover - fallback when dependency not available locally
-    get_allowed_values = None  # type: ignore[assignment]
+import streamlit as st
+from uscgaux import get_allowed_values
+
 
 __all__ = ["build_sidebar"]          # so autoflake/ruff know what’s public
 

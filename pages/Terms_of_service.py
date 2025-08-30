@@ -2,19 +2,17 @@ import os
 import sys
 import streamlit as st
 st.set_page_config(page_title="ASK Auxiliary Source of Knowledge", initial_sidebar_state="collapsed")
-from utils import ui_utils
-
-sys.path.insert(0, ui_utils.parent_dir)
+from uscgaux import streamlit_ui_utils as stui
 
 
-ui_utils.apply_styles()
+stui.apply_ui_styles()
 
 
 back = st.button("< Back to App", type="primary")
 if back:
     st.switch_page("ui.py")
 
-tos = ui_utils.get_markdown("docs/tos.md")
+tos = stui.get_markdown("docs/tos.md")
 
 st.markdown("#### Terms of Service")
 st.write("")

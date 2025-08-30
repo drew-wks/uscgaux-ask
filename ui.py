@@ -1,7 +1,9 @@
-import streamlit as st
-st.set_page_config(page_title="ASK Auxiliary Source of Knowledge", initial_sidebar_state="collapsed")
 import os  # needed for local testing
 import uuid
+import streamlit as st
+
+st.set_page_config(page_title="ASK Auxiliary Source of Knowledge", initial_sidebar_state="collapsed")
+
 from streamlit_feedback import streamlit_feedback
 from langsmith import Client
 from streamlit_extras.stylable_container import stylable_container
@@ -14,17 +16,19 @@ os.environ["LANGCHAIN_PROJECT"] = "ui.py on ASK main/cloud" # use this for local
 
 
 from utils.catalog import load_table_and_date
-from utils import rag, ui_utils
+from utils import rag
+from uscgaux import streamlit_ui_utils as stui
+from uscgaux import streamlit_utils as stu 
+
 import sidebar   
 
 from langsmith import traceable
 
-
-ui_utils.apply_styles()
+stui.apply_ui_styles()
 
 
 # Check Open AI service status
-api_status_message = ui_utils.get_openai_api_status()
+api_status_message = stu.get_openai_api_status()
 if "operational" not in api_status_message:
     st.error(f"ASK is currently down due to OpenAI issue: '{api_status_message}.'")
 else: 
@@ -173,4 +177,4 @@ with stylable_container(
     unsafe_allow_html=True,
     )
 
-st.markdown(ui_utils.FOOTER, unsafe_allow_html=True)
+st.markdown(stui.FOOTER, unsafe_allow_html=True)

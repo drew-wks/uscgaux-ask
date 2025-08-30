@@ -16,7 +16,7 @@ try:
 except Exception:
     pytest.skip("No Streamlit secrets found", allow_module_level=True)
 
-from utils import ui_utils
+
 from utils import rag
 from utils.rag import CONFIG
 
