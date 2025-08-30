@@ -242,11 +242,7 @@ def rag(
     
     # build filter (optional) and retriever
     print(f"Received filter conditions from user: \n{filter_conditions}")
-    try:
-        catalog_id = st.secrets["CATALOG_ID"]
-    except Exception:
-        catalog_id = ""
-    catalog_df, _ = load_table_and_date(catalog_id) if catalog_id else (pd.DataFrame(), "")
+    catalog_df, _ = load_table_and_date()
     allowed_ids = catalog_filter(catalog_df, filter_conditions)
     retrieval_filter = build_retrieval_filter(
         filter_conditions,
@@ -317,11 +313,7 @@ def create_source_lists(response, catalog_df: pd.DataFrame | None = None):
     long_source_markdown_list = []
 
     if catalog_df is None:
-        try:
-            catalog_id = st.secrets["CATALOG_ID"]
-        except Exception:
-            catalog_id = ""
-        catalog_df, _ = load_table_and_date(catalog_id) if catalog_id else (pd.DataFrame(), "")
+        catalog_df, _ = load_table_and_date()
 
     indexed = catalog_df.set_index("pdf_id") if "pdf_id" in catalog_df.columns else None
 

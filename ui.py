@@ -34,9 +34,8 @@ else:
     st.write("#### Get answers to USCG Auxiliary questions from authoritative sources.")
 
 
-# Get the library catalog
-spreadsheet_id = st.secrets["CATALOG_ID"]
-df, last_update_date = load_table_and_date(spreadsheet_id)
+# Get the library catalog via provider adapters
+df, last_update_date = load_table_and_date()
 num_items = len(df)
 
 
