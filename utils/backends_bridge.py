@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 import logging
-from datetime import datetime
 from typing import Any, Tuple, Optional
 
 import gspread
@@ -11,9 +10,10 @@ import streamlit as st
 from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import Resource as DriveClient, build
 
-# Hard dependency on the uscgaux package
+
 from uscgaux import stu
 from uscgaux.config.loader import load_config_by_context
+from uscgaux.backends import BackendContainer
 
 
 logger = logging.getLogger(__name__)
@@ -116,46 +116,45 @@ def get_backend_container() -> BackendContainer:
         st.stop()  # NoReturn
 
 
-from .protocols import BackendContainerProtocol, CatalogConnectorProtocol
-from uscgaux.backends import BackendContainer
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(show_spinner=False, hash_funcs={BackendContainer: lambda obj: f"BackendContainer-{id(obj)}"})
 def fetch_table_and_date(backend_connectors: BackendContainer) -> Tuple[pd.DataFrame, str]:
     """Return the catalog DataFrame and its last modified timestamp.
 
-    This helper uses the uscgaux provider adapter (CatalogConnector) only. No
-    direct Google Sheets/Drive fallback is performed.
+     This helper relies on the active ``CatalogConnector`` provided by the
+    ``BackendContainer``. No direct Google Sheets or Drive fallback is used.
 
     Parameters
     ----------
-    container : BackendContainer 
+    backend_connectors : BackendContainer
+        The backend container instance that provides access to the catalog.
 
     Returns
     -------
-    tuple[pandas.DataFrame, str]
-        A DataFrame of the catalog (filtered to status=live) and
-        an ISO-formatted last modified time (UTC).
+    tuple[pd.DataFrame, str]
+        - A DataFrame of the catalog filtered to rows with ``status="live"``.
+        - An ISO 8601–formatted UTC string representing the last modified time.
 
     Raises
     ------
     RuntimeError
-        If the BackendContainer or CatalogConnector is unavailable.
+        If the catalog cannot be accessed, is empty, or cannot be converted
+        for use in Streamlit.
     """
-    logger.info("fetching tabel and date...")
+    logger.info("fetching catalog and date...")
     core_df = backend_connectors.catalog.fetch_table_and_normalize_catalog_df_for_core()
     if core_df is None or (isinstance(core_df, pd.DataFrame) and core_df.empty):
         logger.error("No catalog accessed or catalog is empty")
         raise RuntimeError("Catalog is unavailable or empty")
-    logger.info("core_df shape: %d rows x %d columns", core_df.shape[0], core_df.shape[1])
     
     st_df = stu.normalize_core_catalog_df_to_streamlit(core_df, ["live"])
     if st_df is None or (isinstance(st_df, pd.DataFrame) and st_df.empty):
-        logger.error("Failed to convert catalog to streamlit")
-        raise RuntimeError("Failed to convert catalog to streamlit")
-    logger.info("st_df shape: %d rows x %d columns", st_df.shape[0], st_df.shape[1])
+        logger.error("Failed to convert catalog to Streamlit")
+        raise RuntimeError("Failed to convert catalog to Streamlit")
+
     
     modified_time = backend_connectors.catalog.get_catalog_modified_time()
     
-    logger.info("Fetched catalog via uscgaux provider adapter")
+    logger.info("✅ Catalog successfully fetched")
     
     return st_df, modified_time

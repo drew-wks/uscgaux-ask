@@ -1,8 +1,9 @@
 import os  # needed for local testing
 import re
-from typing import List, Optional
+from typing import List, Tuple, Optional
 from typing_extensions import Annotated, TypedDict
 import pandas as pd 
+from functools import lru_cache
 import streamlit as st
 from qdrant_client import QdrantClient
 from qdrant_client.http import models  # for running filters on the metadata
@@ -107,36 +108,75 @@ def get_retrieval_context(spreadsheet_id: str) -> dict:
     return context_dict
 
 
+# Path to prompt enrichment dictionaries (project-level `config` directory)
+# Resolve base directory as the repository root relative to this file
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+ACRONYMS_PATH = os.path.join(BASE_DIR, 'config', 'acronyms.csv')
+TERMS_PATH = os.path.join(BASE_DIR, 'config', 'terms.csv')
+
+
+@lru_cache(maxsize=64)
+def get_retrieval_context_csv(file_path: str) -> dict:
+    """
+    Reads a CSV file into a dictionary.
+    """
+    df = pd.read_csv(file_path)
+
+    if df.shape[1] < 2:
+        raise ValueError("CSV must contain at least two columns")
+
+    context_dict: dict = dict(zip(df.iloc[:, 0], df.iloc[:, 1]))
+    return context_dict
+
+
 
 # Define the enrichment function.
 # traceable decorator is used to trace the function in Langsmith
 # cache_data decorator is used to cache the function in Streamlit
 @traceable(run_type="prompt")
 #@st.cache_data
-def enrich_question(user_question: str, spreadsheet_id: str | None = None) -> str:
-    if spreadsheet_id is None:
-        try:
-            spreadsheet_id = st.secrets["ENRICHMENT_SPREADSHEET_ID"]
-        except Exception:
-            spreadsheet_id = ""
 
-    enrichment_dict = (
-        get_retrieval_context(spreadsheet_id) if spreadsheet_id else {}
-    )
-    acronyms_dict = enrichment_dict.get("acronyms", {})
-    terms_dict = enrichment_dict.get("terms", {})
+
+def enrich_question(user_question: str, acronyms_csv_path: str, terms_csv_path: str) -> str:
+    """
+    Enrich a user question by:
+    - Expanding acronyms to their full forms
+    - Adding explanations for defined terms
+
+    Parameters
+    ----------
+    user_question : str
+        The question text to enrich.
+    acronyms_csv_path : str
+        Path to CSV file containing acronym mappings (acronym → full form).
+    terms_csv_path : str
+        Path to CSV file containing term mappings (term → explanation).
+
+    Returns
+    -------
+    str
+        The enriched version of the user question.
+    """
+    acronyms_dict = get_retrieval_context_csv(acronyms_csv_path)
+    terms_dict = get_retrieval_context_csv(terms_csv_path)
 
     enriched_question = user_question
+
     # Replace acronyms with full form
     for acronym, full_form in acronyms_dict.items():
         if pd.notna(acronym) and pd.notna(full_form):
             enriched_question = re.sub(
-                r'\b' + re.escape(str(acronym)) + r'\b', str(full_form), enriched_question)
-    # Add explanations
+                r'\b' + re.escape(str(acronym)) + r'\b',
+                str(full_form),
+                enriched_question
+            )
+
+    # Add explanations for terms
     for term, explanation in terms_dict.items():
         if pd.notna(term) and pd.notna(explanation):
             if str(term) in enriched_question:
                 enriched_question += f" ({str(explanation)})"
+
     return enriched_question
 
 
@@ -226,7 +266,7 @@ def rag(
 )
     print("\n🤖 Initiated RAG pipeline")
     # Enrich the question
-    enriched_question = enrich_question(user_question)
+    enriched_question = enrich_question(user_question, ACRONYMS_PATH, TERMS_PATH)
     print("\nQuestion has been enriched")
     
     # Set the user identity
@@ -300,7 +340,7 @@ def rag_for_eval(input: dict) -> dict:
     return {"answer": response["answer"]}
 
 
-def create_source_lists(response, catalog_df: pd.DataFrame | None = None):
+def create_source_lists(response: dict, catalog_df: pd.DataFrame) -> Tuple:
     """
     Creates and returns both the short and long source lists as strings.
 
@@ -315,8 +355,6 @@ def create_source_lists(response, catalog_df: pd.DataFrame | None = None):
     short_source_markdown_list = []
     long_source_markdown_list = []
 
-    if catalog_df is None:
-        catalog_df, _ = load_table_and_date()
 
     indexed = catalog_df.set_index("pdf_id") if "pdf_id" in catalog_df.columns else None
 

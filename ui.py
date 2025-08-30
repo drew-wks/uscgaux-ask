@@ -30,23 +30,28 @@ from langsmith import traceable
 
 # Check Open AI service status
 api_status_message = stu.get_openai_api_status()
-if "operational" not in api_status_message:
+api_operational = "operational" in api_status_message
+if not api_operational:
     st.error(f"ASK is currently down due to OpenAI issue: '{api_status_message}.'")
-else: 
-    st.write("#### Get answers to USCG Auxiliary questions from authoritative sources.")
 
 # Ensure variables exist even if initialization fails
 df: pd.DataFrame = pd.DataFrame()
 last_update_date: str = ""
+backend_ready: bool = False
 
 try:
     backend_connectors = get_backend_container()
     df, last_update_date = fetch_table_and_date(backend_connectors)
+    backend_ready = True
 except Exception as exc:
     import logging
     logging.getLogger(__name__).exception("Backend init/fetch failed")
     st.error("ASK is currently unavailable due to a dependency issue. Please try again later.")
     # Fallback to empty catalog so downstream code can render
+
+# Only show intro message if all checks succeeded
+if api_operational and backend_ready:
+    st.write("#### Get answers to USCG Auxiliary questions from authoritative sources.")
 
 num_items = len(df)
 
@@ -130,7 +135,7 @@ if st.session_state.get("user_question") and "response" not in st.session_state:
 if st.session_state.get("response"):
     status_placeholder.empty()
     response = st.session_state["response"]
-    short_source_list, long_source_list = rag.create_source_lists(response)
+    short_source_list, long_source_list = rag.create_source_lists(response, df)
     example_questions.empty()  
     # Show active filter summary chip above results
     fc = st.session_state.get("filter_conditions", {}) or {}
