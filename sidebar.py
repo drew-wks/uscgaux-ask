@@ -1,7 +1,7 @@
 # sidebar.py
 from typing import List
 import streamlit as st
-from uscgaux import get_allowed_values
+from uscgaux import get_allowed_values  # hard dependency
 
 
 __all__ = ["build_sidebar"]          # so autoflake/ruff know what’s public
@@ -22,13 +22,11 @@ def build_sidebar():
 
     # Scope selection derived from shared schema when available
     default_scopes: List[str]
-    if get_allowed_values is not None:
-        try:
-            # Base scopes from the shared schema
-            default_scopes = [str(x) for x in get_allowed_values("scope")]
-        except Exception:
-            default_scopes = ["National", "District"]
-    else:
+    # Base scopes from the shared schema
+    try:
+        default_scopes = [str(x) for x in get_allowed_values("scope")]
+    except Exception:
+        # If schema cannot be read at runtime, degrade to known values
         default_scopes = ["National", "District"]
 
     # Build options from schema and include a combined option "Both"
@@ -42,11 +40,10 @@ def build_sidebar():
 
     # District(s) multi-select (only relevant when District or Both)
     units_options: List[str] = []
-    if get_allowed_values is not None:
-        try:
-            units_options = [str(x) for x in get_allowed_values("unit", {"scope": "District"})]
-        except Exception:
-            units_options = []
+    try:
+        units_options = [str(x) for x in get_allowed_values("unit", {"scope": "District"})]
+    except Exception:
+        units_options = []
 
     selected_units: List[str] = []
     if scope_choice in ("District", "Both"):
@@ -55,7 +52,11 @@ def build_sidebar():
             help="Choose one or more districts to include"
         )
 
-    st.sidebar.divider()
+    # Visual separator (older Streamlit or test spies may not implement divider)
+    try:
+        st.sidebar.divider()
+    except Exception:
+        st.sidebar.markdown("---")
     # Expiration filter
     exclude_expired = st.sidebar.checkbox("Exclude expired documents", value=True)
     st.sidebar.caption(

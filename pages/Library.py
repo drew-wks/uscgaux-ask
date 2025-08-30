@@ -24,7 +24,11 @@ with tab1:
     
 
 with tab2:
-    df, last_update_date = load_table_and_date()
+    try:
+        df, last_update_date = load_table_and_date()
+    except Exception:
+        st.error("Library is unavailable due to a dependency issue. Please try again later.")
+        df, last_update_date = (None, "")
     overview = stui.get_markdown("docs/library_overview.md")
 
     if df is not None:

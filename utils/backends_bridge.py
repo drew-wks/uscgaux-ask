@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import logging
 from datetime import datetime
-from typing import Any, Tuple
+from typing import Any, Tuple, Optional
 
 import gspread
 import pandas as pd
@@ -11,14 +11,9 @@ import streamlit as st
 from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import Resource as DriveClient, build
 
-# Optional imports from the uscgaux package (installed via requirements.txt).
-# These are used for provider-agnostic access to the catalog via connectors.
-try:
-    from uscgaux.config.loader import load_config_by_context
-    from uscgaux.backends import init_connectors
-except Exception:  # pragma: no cover - allow runtime environments without the package to import
-    load_config_by_context = None  # type: ignore[assignment]
-    init_connectors = None  # type: ignore[assignment]
+# Hard dependency on the uscgaux package
+from uscgaux import stu
+from uscgaux.config.loader import load_config_by_context
 
 
 logger = logging.getLogger(__name__)
@@ -94,86 +89,73 @@ def init_sheets_client(creds: Credentials) -> gspread.client.Client:
 
 # --- Backend container (uscgaux) -------------------------------------------------
 
-@st.cache_resource(show_spinner=False)
-def get_backend_container() -> Any:
-    """Return a cached BackendContainer initialized from the active context.
+@st.cache_resource(show_spinner=True)
+def get_backend_container() -> BackendContainer:
+    """Return a cached BackendContainer
 
-    Uses the uscgaux configuration loader and backend initializer to build a
-    provider-agnostic set of connectors. The result is cached for reuse.
+    Loads the active configuration via ``load_config_by_context()`` and passes
+    it into ``stu.cached_init_connectors(cfg)`` for initialization.
 
     Returns
     -------
-    Any
-        A BackendContainer from ``uscgaux.backends`` (type left as Any to avoid
-        import-time tight coupling during local tooling or tests).
+    BackendContainer
+        A BackendContainer from ``uscgaux.backends`` 
     """
-    if load_config_by_context is None or init_connectors is None:
-        logger.warning(
-            "uscgaux package not available; backend container cannot be initialized"
-        )
-        return None
+    config = load_config_by_context()
+    
+    try:
+        *_, backend_connectors = stu.cached_init_connectors(config)
+        if backend_connectors is None:  # defensive: avoid caching a bad init
+            logger.error("stu.cached_init_connectors returned None; stopping initialization")
+            st.error("⚠️ Could not initialize backends. See logs for details.")
+            st.stop()  # NoReturn
+        return backend_connectors
+    except Exception:
+        logger.exception("BackendContainer unavailable (uscgaux required).")
+        st.error("⚠️ Could not initialize backends. See logs for details.")
+        st.stop()  # NoReturn
 
-    cfg = load_config_by_context()
-    container = init_connectors(cfg)
-    logger.info("Initialized BackendContainer via uscgaux connectors")
-    return container
 
+from .protocols import BackendContainerProtocol, CatalogConnectorProtocol
+from uscgaux.backends import BackendContainer
 
 @st.cache_data(show_spinner=False)
-def load_table_and_date() -> Tuple[pd.DataFrame, str]:
+def fetch_table_and_date(backend_connectors: BackendContainer) -> Tuple[pd.DataFrame, str]:
     """Return the catalog DataFrame and its last modified timestamp.
 
     This helper uses the uscgaux provider adapter (CatalogConnector) only. No
     direct Google Sheets/Drive fallback is performed.
 
+    Parameters
+    ----------
+    container : BackendContainer 
+
     Returns
     -------
     tuple[pandas.DataFrame, str]
-        A DataFrame of the catalog (filtered to status=live when possible) and
-        an ISO-formatted last modified time (UTC). Empty values on failure.
+        A DataFrame of the catalog (filtered to status=live) and
+        an ISO-formatted last modified time (UTC).
+
+    Raises
+    ------
+    RuntimeError
+        If the BackendContainer or CatalogConnector is unavailable.
     """
-    try:
-        container = get_backend_container()
-        if not container or getattr(container, "catalog", None) is None:
-            logger.error("BackendContainer or CatalogConnector unavailable")
-            return pd.DataFrame(), ""
-
-        catalog = container.catalog  # type: ignore[attr-defined]
-
-        # Fetch the catalog DataFrame strictly via connector API/attributes
-        df: pd.DataFrame | None = None
-        for method_name in ("get_catalog", "load_catalog", "get_catalog_df"):
-            method = getattr(catalog, method_name, None)
-            if callable(method):
-                candidate = method()  # type: ignore[call-arg]
-                if isinstance(candidate, pd.DataFrame):
-                    df = candidate
-                    break
-
-        if df is None:
-            maybe_df = getattr(catalog, "catalog_df", None)
-            if isinstance(maybe_df, pd.DataFrame):
-                df = maybe_df
-
-        # Get modified time via adapter API if available
-        modified_time = ""
-        get_mtime = getattr(catalog, "get_catalog_modified_time", None)
-        if callable(get_mtime):
-            mt = get_mtime()
-            if isinstance(mt, str):
-                modified_time = mt
-            elif isinstance(mt, datetime):
-                modified_time = mt.strftime("%Y-%m-%dT%H:%M:%SZ")
-
-        if df is None:
-            logger.error("CatalogConnector did not return a DataFrame")
-            return pd.DataFrame(), modified_time
-
-        if "status" in df.columns:
-            live_mask = df["status"].astype(str).str.strip().str.lower() == "live"
-            df = df[live_mask]
-        logger.info("Loaded catalog via uscgaux provider adapter (no fallback)")
-        return df, modified_time
-    except Exception:  # noqa: BLE001
-        logger.exception("Failed to load catalog via provider adapter")
-        return pd.DataFrame(), ""
+    logger.info("fetching tabel and date...")
+    core_df = backend_connectors.catalog.fetch_table_and_normalize_catalog_df_for_core()
+    if core_df is None or (isinstance(core_df, pd.DataFrame) and core_df.empty):
+        logger.error("No catalog accessed or catalog is empty")
+        raise RuntimeError("Catalog is unavailable or empty")
+    logger.info("core_df shape: %d rows x %d columns", core_df.shape[0], core_df.shape[1])
+    
+    st_df = stu.normalize_core_catalog_df_to_streamlit(core_df, ["live"])
+    if st_df is None or (isinstance(st_df, pd.DataFrame) and st_df.empty):
+        logger.error("Failed to convert catalog to streamlit")
+        raise RuntimeError("Failed to convert catalog to streamlit")
+    logger.info("st_df shape: %d rows x %d columns", st_df.shape[0], st_df.shape[1])
+    
+    modified_time = backend_connectors.catalog.get_catalog_modified_time()
+    
+    logger.info("Fetched catalog via uscgaux provider adapter")
+    
+    return st_df, modified_time

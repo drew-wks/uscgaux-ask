@@ -31,6 +31,8 @@ Local qdrant_db
 qdrant_db
 tests/qdrant_db
 
+#Backups
+/uscgaux/backends/backups
 
 # Distribution / packaging
 .Python

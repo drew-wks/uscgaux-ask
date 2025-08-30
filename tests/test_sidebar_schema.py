@@ -108,7 +108,12 @@ def test_sidebar_uses_schema_when_available(monkeypatch: pytest.MonkeyPatch):
 
 
 def test_sidebar_fallback_without_schema(monkeypatch: pytest.MonkeyPatch):
-    """If schema import fails, widget should still render with sensible defaults."""
+    """Fallback is no longer supported: app requires `uscgaux` in CI/dev.
+
+    This test is skipped to reflect the hard dependency policy.
+    """
+    import pytest as _pytest
+    _pytest.skip("uscgaux is a hard dependency; fallback behavior is disabled.")
     spy = SidebarSpy()
     _install_fake_streamlit(monkeypatch, spy)
 

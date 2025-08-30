@@ -13,9 +13,10 @@ from langchain_core.prompts import ChatPromptTemplate
 from langsmith import traceable  # RAG pipeline instrumentation platform
 from .filter import build_retrieval_filter, catalog_filter
 from .backends_bridge import (
-    load_table_and_date,
     get_gcp_credentials,
     init_sheets_client,
+    get_backend_container,
+    fetch_table_and_date
 )
 
 
@@ -242,7 +243,9 @@ def rag(
     
     # build filter (optional) and retriever
     print(f"Received filter conditions from user: \n{filter_conditions}")
-    catalog_df, _ = load_table_and_date()
+    
+    backend_connectors = get_backend_container()
+    catalog_df, _ = fetch_table_and_date(backend_connectors)
     allowed_ids = catalog_filter(catalog_df, filter_conditions)
     retrieval_filter = build_retrieval_filter(
         filter_conditions,
