@@ -21,10 +21,6 @@ from .backends_bridge import (
 
 # st.secrets pulls from ~/.streamlit when run locally
 
-# Config Qdrant
-QDRANT_URL = st.secrets["QDRANT_URL"]
-QDRANT_API_KEY = st.secrets["QDRANT_API_KEY"]
-QDRANT_PATH = "/Users/drew_wilkins/Drews_Files/Drew/Python/Localcode/Drews_Tools/qdrant_ASK_lib_tools/qdrant_db"  # on macOS, default is: /private/tmp/local_qdrant
 
 # Config langchain_openai
 OPENAI_API_KEY = st.secrets["OPENAI_API_KEY_ASK"] # for langchain_openai.OpenAIEmbeddings
@@ -67,34 +63,6 @@ def get_retriever(retrieval_filter: Optional[models.Filter]):
     return retriever
 
 
-# Create and cache the document retriever
-#@st.cache_resource
-def get_retriever_old(retrieval_filter: Optional[models.Filter]):
-    '''Creates and caches the document retriever and Qdrant client with optional filters.'''
-
-
-    # Qdrant client cloud instance
-    client = QdrantClient(
-        url=QDRANT_URL,
-        prefer_grpc=True,
-        api_key=QDRANT_API_KEY,
-        # path=QDRANT_PATH  # local instance
-    )  
-
-    qdrant = QdrantVectorStore(
-        client=client,
-        collection_name=CONFIG["qdrant_collection_name"],
-        embedding=OpenAIEmbeddings(model=CONFIG["embedding_model"]),
-    )
-
-    retriever = qdrant.as_retriever(
-        search_type=CONFIG["ASK_search_type"],
-        search_kwargs={'k': CONFIG["ASK_k"], "fetch_k": CONFIG["ASK_fetch_k"],
-                       "lambda_mult": CONFIG["ASK_lambda_mult"], "filter": retrieval_filter},  # If None, no metadata filering occurs
-    )
-    return retriever
-
-
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 ACRONYMS_PATH = os.path.join(BASE_DIR, 'config', 'acronyms.csv')
@@ -121,8 +89,6 @@ def get_retrieval_context_csv(file_path: str) -> dict:
 # cache_data decorator is used to cache the function in Streamlit
 @traceable(run_type="prompt")
 #@st.cache_data
-
-
 def enrich_question(user_question: str, acronyms_csv_path: str, terms_csv_path: str) -> str:
     """
     Enrich a user question by:
