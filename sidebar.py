@@ -20,9 +20,9 @@ def build_sidebar():
         `scope` ("National" | "District" | "Both"), and optional `units` (list[str]).
     """
 
-    st.sidebar.markdown(
-        "#### Experimental\n\n  The following features are experimental and may not work as expected.\n\n"
-    )
+    # st.sidebar.markdown(
+    #    "#### Experimental\n\n  The following features are experimental and may not work as # expected.\n\n"
+    #)
 
     # Scope selection
     default_scopes: List[str]
@@ -39,7 +39,7 @@ def build_sidebar():
     scope_options = ["National", "District", "Both"]
     # Radio defaults to National
     scope_choice = st.sidebar.radio(
-        "Scope", options=scope_options, index=0, horizontal=False
+        "Include documents at the following levels:", options=scope_options, index=0, horizontal=False
     )
 
     # District(s) multi-select (only relevant when District or Both)
@@ -53,10 +53,11 @@ def build_sidebar():
     selected_units: List[str] = []
     if scope_choice in ("District", "Both"):
         selected_units = st.sidebar.multiselect(
-            "District(s)", options=units_options, default=[],
+            "Select your District(s)", options=units_options, default=[],
             help="Choose one or more districts to include"
         )
 
+    st.sidebar.divider()
     # Expiration filter
     exclude_expired = st.sidebar.checkbox("Exclude expired documents", value=True)
     st.sidebar.caption(
