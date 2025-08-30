@@ -3,7 +3,9 @@ import base64
 import os  # needed for local testing
 import sys
 import streamlit as st
+
 st.set_page_config(page_title="ASK Auxiliary Source of Knowledge", initial_sidebar_state="collapsed")
+
 from utils.backends_bridge import get_backend_container, fetch_table_and_date
 from uscgaux import stui
 

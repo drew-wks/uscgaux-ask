@@ -8,7 +8,6 @@ import gspread
 import pandas as pd
 import streamlit as st
 from google.oauth2.service_account import Credentials
-from googleapiclient.discovery import Resource as DriveClient, build
 
 
 from uscgaux import stu
@@ -43,24 +42,6 @@ def get_gcp_credentials() -> Credentials:
         logger.exception("Failed to load GCP credentials from environment")
         raise ValueError(f"Failed to load GCP credentials from environment: {exc}") from exc
     
-    
-def init_drive_client(creds: Credentials) -> DriveClient:
-    """Initialize a Google Drive client with the given credentials.
-
-    Parameters
-    ----------
-    creds : Credentials
-        Google service account or user credentials.
-
-    Returns
-    -------
-    googleapiclient.discovery.Resource
-        Authorized client for Google Drive v3 API.
-    """
-    scoped_creds = creds.with_scopes(["https://www.googleapis.com/auth/drive"])
-    client = build("drive", "v3", credentials=scoped_creds)
-    logger.info("Google Drive client initialized with scoped credentials")
-    return client
 
 
 
