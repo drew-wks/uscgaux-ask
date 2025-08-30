@@ -2,7 +2,7 @@ import os
 import sys
 import streamlit as st
 st.set_page_config(page_title="ASK Auxiliary Source of Knowledge", initial_sidebar_state="collapsed")
-from uscgaux import streamlit_ui_utils as stui
+from uscgaux import stui, stu
 
 
 stui.apply_ui_styles()

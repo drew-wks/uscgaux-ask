@@ -5,8 +5,7 @@ import sys
 import streamlit as st
 st.set_page_config(page_title="ASK Auxiliary Source of Knowledge", initial_sidebar_state="collapsed")
 from utils.catalog import load_table_and_date
-from uscgaux import streamlit_ui_utils as stui
-from uscgaux import streamlit_utils as stu 
+from uscgaux import stui, stu
 
 
 stui.apply_ui_styles()

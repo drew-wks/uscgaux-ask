@@ -17,8 +17,7 @@ os.environ["LANGCHAIN_PROJECT"] = "ui.py on ASK main/cloud" # use this for local
 
 from utils.catalog import load_table_and_date
 from utils import rag
-from uscgaux import streamlit_ui_utils as stui
-from uscgaux import streamlit_utils as stu 
+from uscgaux import stui, stu
 
 import sidebar   
 
