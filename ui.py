@@ -15,7 +15,7 @@ os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_PROJECT"] = "ui.py on ASK main/cloud" # use this for local testing
 
 
-from utils.catalog import load_table_and_date
+from utils.backends_bridge import load_table_and_date
 from utils import rag
 from uscgaux import stui, stu
 

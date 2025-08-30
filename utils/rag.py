@@ -12,7 +12,7 @@ from langchain_ollama import ChatOllama  # to test other LLMs
 from langchain_core.prompts import ChatPromptTemplate
 from langsmith import traceable  # RAG pipeline instrumentation platform
 from .filter import build_retrieval_filter, catalog_filter
-from .catalog import (
+from .backends_bridge import (
     load_table_and_date,
     get_gcp_credentials,
     init_sheets_client,
