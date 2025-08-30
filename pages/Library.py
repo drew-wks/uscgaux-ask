@@ -8,6 +8,7 @@ st.set_page_config(page_title="ASK Auxiliary Source of Knowledge", initial_sideb
 
 from utils.backends_bridge import get_backend_container, fetch_table_and_date
 from uscgaux import stui
+from uscgaux.utils.value_utils import format_epoch_as_ui_string, format_epoch_as_filename_string
 
 
 stui.apply_ui_styles()
@@ -26,12 +27,19 @@ with tab1:
     
 
 with tab2:
+    df = None
+    last_update_date_ts = ""
+    last_update_date_fn = format_epoch_as_filename_string(last_update_date_ts)
+    last_update_date_ui = format_epoch_as_ui_string(last_update_date_ts)
+    
     try:
         backend_connectors = get_backend_container()
-        df, last_update_date = fetch_table_and_date(backend_connectors)
+        df, last_update_date_ts = fetch_table_and_date(backend_connectors)
+        last_update_date_fn = format_epoch_as_filename_string(last_update_date_ts)
+        last_update_date_ui = format_epoch_as_ui_string(last_update_date_ts)
     except Exception:
         st.error("Library is unavailable due to a dependency issue. Please try again later.")
-        df, last_update_date = (None, "")
+
     overview = stui.get_markdown("docs/library_overview.md")
 
     if df is not None:
@@ -40,14 +48,14 @@ with tab2:
         st.markdown(f"ASK is loaded with **{num_items}** national documents (almost 9000 pages) including USCG Directives, CHDIRAUX documents and documents issued by the USCG Auxiliary National leadership. All these documents are located in public sections of the USCG and USCG Auxiliary websites (cgaux.org uscg.mil).  No secure content is included (i.e., content requiring Member Zone or CAC access). All documents are national in scope as of right now. Regional requirements may vary, so check with your local AOR leadership for the final word. ")
         st.markdown(f"{overview}")
         st.markdown("#### Library Catalog")
-        st.markdown(f"{num_items} items. Last update: {last_update_date}")  
+        st.markdown(f"{num_items} items. Last update: {last_update_date_ui}")  
 
         # Display the DataFrame
         desired_cols = ['title', 'publication_number', 'organization', 'issue_date', 'expiration_date', 'scope', 'unit']
         available_cols = [col for col in desired_cols if col in df.columns]
         display_df = df[available_cols]
         edited_df = st.data_editor(display_df, use_container_width=True, hide_index=False, disabled=True)
-        isim = f'ASK_catalog_export{last_update_date}.csv'
+        isim = f'ASK_catalog_export{last_update_date_fn}.csv'
         indir = edited_df.to_csv(index=False)
         b64 = base64.b64encode(indir.encode(encoding='utf-8')).decode(encoding='utf-8')  
         linko_final = f'<a href="data:file/csv;base64,{b64}" download="{isim}">Click to download the catalog</a>'
