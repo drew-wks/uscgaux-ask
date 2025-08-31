@@ -16,7 +16,10 @@ os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_PROJECT"] = "ui.py on ASK main/cloud" # use this for local testing
 
 
-from utils.backends_bridge import get_backend_container, fetch_table_and_date
+from utils.backends_bridge import (
+    get_catalog_connector,
+    fetch_table_and_date_from_catalog,
+)
 from utils import rag
 from uscgaux import stui, stu
 import sidebar   
@@ -40,8 +43,8 @@ last_update_date: str = ""
 backend_ready: bool = False
 
 try:
-    backend_connectors = get_backend_container()
-    df, last_update_date = fetch_table_and_date(backend_connectors)
+    catalog = get_catalog_connector()
+    df, last_update_date = fetch_table_and_date_from_catalog(catalog)
     backend_ready = True
 except Exception as exc:
     import logging
@@ -55,6 +58,7 @@ if api_operational and backend_ready:
 
 num_items = len(df)
 
+st.header(last_update_date)
 
 # Main app body copy
 st.markdown(f"ASK uses Artificial Intelligence (AI) to search {num_items} Coast Guard Auxiliary references for answers. This is a working prototype for evaluation. Not an official USCG Auxiliary service. Learn more <a href='Library' target='_self'><b>here</b></a>.", unsafe_allow_html=True)

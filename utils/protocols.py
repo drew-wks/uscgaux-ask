@@ -1,42 +1,33 @@
-"""Typed interfaces for provider adapters and schema.
+"""Typed interfaces for connectors used by ASK.
 
-These Protocols decouple our code from concrete implementations in the
-external `uscgaux` package and make testing/mocking straightforward.
+These Protocols allow us to depend on a minimal surface area and avoid a hard
+compile-time dependency on concrete classes from the `uscgaux` package in the
+ask app code paths.
 """
 
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Protocol, runtime_checkable
+from typing import Protocol, runtime_checkable, Any
 
 import pandas as pd
 
 
 @runtime_checkable
 class CatalogConnectorProtocol(Protocol):
-    """Provider adapter interface for catalog access."""
+    """Provider adapter interface for catalog access used by ASK."""
 
-    def get_catalog(self) -> pd.DataFrame:  # pragma: no cover - signature only
+    def fetch_table_and_normalize_catalog_df_for_core(self) -> pd.DataFrame:  # pragma: no cover - signature only
         ...
 
-    def get_catalog_modified_time(self) -> str | datetime:  # pragma: no cover
+    def get_catalog_modified_time(self) -> str | datetime | float | None:  # pragma: no cover - implementation may vary
         ...
 
 
 @runtime_checkable
-class BackendContainerProtocol(Protocol):
-    """Top-level container of connectors provided by `uscgaux.backends`."""
+class VectorDBConnectorProtocol(Protocol):
+    """Minimal interface for the vector DB connector used by ASK."""
 
-    catalog: CatalogConnectorProtocol
-    catalog_archive: CatalogConnectorProtocol
-
-
-@runtime_checkable
-class SchemaAPIProtocol(Protocol):
-    """Schema API surface offered by the `uscgaux` package."""
-
-    def get_allowed_values(self, field: str, context: dict | None = None) -> list[str]:  # pragma: no cover
+    def get_langchain_vectorstore(self) -> Any:  # pragma: no cover - returns a LangChain VectorStore
         ...
 
-    def get_catalog_schema(self) -> dict:  # pragma: no cover
-        ...

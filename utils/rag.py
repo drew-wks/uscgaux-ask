@@ -14,8 +14,9 @@ from langchain_core.prompts import ChatPromptTemplate
 from langsmith import traceable  # RAG pipeline instrumentation platform
 from .filter import build_retrieval_filter, catalog_filter
 from .backends_bridge import (
-    get_backend_container,
-    fetch_table_and_date
+    get_vectordb_connector,
+    get_catalog_connector,
+    fetch_table_and_date_from_catalog,
 )
 
 
@@ -52,8 +53,8 @@ CONFIG = {
 def get_retriever(retrieval_filter: Optional[models.Filter]):
     '''Creates and caches the document retriever and Qdrant client with optional filters.'''
     
-    backend_connectors = get_backend_container()
-    qdrant = backend_connectors.vectordb.get_langchain_vectorstore()
+    vectordb = get_vectordb_connector()
+    qdrant = vectordb.get_langchain_vectorstore()
 
     retriever = qdrant.as_retriever(
     search_type=CONFIG["ASK_search_type"],
@@ -236,8 +237,8 @@ def rag(
     # build filter (optional) and retriever
     print(f"Received filter conditions from user: \n{filter_conditions}")
     
-    backend_connectors = get_backend_container()
-    catalog_df, _ = fetch_table_and_date(backend_connectors)
+    catalog = get_catalog_connector()
+    catalog_df, _ = fetch_table_and_date_from_catalog(catalog)
     allowed_ids = catalog_filter(catalog_df, filter_conditions)
     retrieval_filter = build_retrieval_filter(
         filter_conditions,
