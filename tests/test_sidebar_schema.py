@@ -107,6 +107,26 @@ def test_sidebar_uses_schema_when_available(monkeypatch: pytest.MonkeyPatch):
     assert filters.get("scope") in ("District", "National", "Both")
 
 
+def test_sidebar_excludes_area_option(monkeypatch: pytest.MonkeyPatch):
+    """If upstream exposes 'Area' as a scope, the UI should hide it."""
+    spy = SidebarSpy()
+    _install_fake_streamlit(monkeypatch, spy)
+    # Include 'Area' in upstream values
+    _install_fake_schema(monkeypatch, scope_vals=["National", "District", "Area"], unit_vals=["1"])
+    
+    # Re-import sidebar to bind the fake schema
+    if "sidebar" in sys.modules:
+        del sys.modules["sidebar"]
+    sidebar = importlib.import_module("sidebar")
+
+    _ = sidebar.build_sidebar()
+
+    assert spy.radios, "No radio widget was created"
+    radio_opts = spy.radios[0]["options"]
+    assert "Area" not in radio_opts, "'Area' should be excluded from scope options"
+    assert "Both" in radio_opts, "Combined scope option 'Both' should be present"
+
+
 def test_sidebar_fallback_without_schema(monkeypatch: pytest.MonkeyPatch):
     """Fallback is no longer supported: app requires `uscgaux` in CI/dev.
 

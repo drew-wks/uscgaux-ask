@@ -148,7 +148,9 @@ if st.session_state.get("response"):
     example_questions.empty()  
     # Show active filter summary chip above results
     fc = st.session_state.get("filter_conditions", {}) or {}
-    scope = str(fc.get("scope", "National")).strip()
+    # Sanitize scope for display: never show 'Area'
+    _raw_scope = str(fc.get("scope", "National")).strip()
+    scope = "National" if _raw_scope.lower() == "area" else _raw_scope
     units = fc.get("units", []) or []
     units_label = ", ".join(units) if units else ("All" if scope in ("District", "Both") else "—")
     chip_html = f"""
