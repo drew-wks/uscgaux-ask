@@ -79,7 +79,7 @@ def fetch_table_and_date_from_catalog() -> tuple[pd.DataFrame, str]:
     modified_time = catalog.get_catalog_modified_time()
 
     logger.info("✅ Catalog successfully fetched via connector")
-    return st_df, str(modified_time) if modified_time is not None else ""
+    return st_df, str(modified_time) if modified_time is not None else "--"
 
 
 @st.cache_resource(show_spinner=False)
