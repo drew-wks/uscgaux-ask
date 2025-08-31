@@ -7,12 +7,12 @@ ASK contains:
 - Policy documents
 
 ASK does NOT contain:
+- Expired documents. That includes the Auxiliary Manual. There's a switch in the left tab to include them if you choose.
 - Private documents: ASK does not contain information from behind MemberZone, such as L2 Messages or most National Workshops
 - Outdated documents: ASK doesn't include cancelled, expired or superceded documents
 - Local or Regional documents
 - Information from AUXDATA or AUXDIRECTORY
-- ALAUX messages designated informational from past years, such as those commemorating/recognizing people or events
+- ALAUX messages designated as informational from past years, such as those commemorating/recognizing people or events
 - ALAUX promulgation announcements (since they duplicate the policies themselves and interfere with document retrival)
 - Biographies or points of contact lists
-- Event-related info such as schedules or calendars (e.g., C-School Calendar, NACON schedule)
-- 
+- Event-related info such as schedules or calendars (e.g., C-School Calendar, NACON schedule)  

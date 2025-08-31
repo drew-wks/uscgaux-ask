@@ -49,14 +49,14 @@ with tab2:
         st.markdown(f"ASK is loaded with **{num_items}** national documents (almost 9000 pages) including USCG Directives, CHDIRAUX documents and documents issued by the USCG Auxiliary National leadership. All these documents are located in public sections of the USCG and USCG Auxiliary websites (cgaux.org uscg.mil).  No secure content is included (i.e., content requiring Member Zone or CAC access). All documents are national in scope as of right now. Regional requirements may vary, so check with your local AOR leadership for the final word. ")
         st.markdown(f"{overview}")
         st.markdown("#### Library Catalog")
-        st.markdown(f"{num_items} items. Last update: {last_update_date_ui}")  
+        st.markdown(f"{num_items} items. Last updated on: {last_update_date_ui}")  
 
         # Display the DataFrame
         desired_cols = ['title', 'publication_number', 'organization', 'issue_date', 'expiration_date', 'scope', 'unit']
         available_cols = [col for col in desired_cols if col in df.columns]
         display_df = df[available_cols]
         edited_df = st.data_editor(display_df, use_container_width=True, hide_index=False, disabled=True)
-        isim = f'ASK_catalog_export{last_update_date_fn}.csv'
+        isim = f'ASK_catalog_export_{last_update_date_fn}.csv'
         indir = edited_df.to_csv(index=False)
         b64 = base64.b64encode(indir.encode(encoding='utf-8')).decode(encoding='utf-8')  
         linko_final = f'<a href="data:file/csv;base64,{b64}" download="{isim}">Click to download the catalog</a>'

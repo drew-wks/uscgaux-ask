@@ -56,8 +56,6 @@ if api_operational and backend_ready:
 
 num_items = len(df)
 
-st.header(last_update_date)
-
 # Main app body copy
 st.markdown(f"ASK uses Artificial Intelligence (AI) to search {num_items} Coast Guard Auxiliary references for answers. This is a working prototype for evaluation. Not an official USCG Auxiliary service. Learn more <a href='Library' target='_self'><b>here</b></a>.", unsafe_allow_html=True)
 example_questions = st.empty()
