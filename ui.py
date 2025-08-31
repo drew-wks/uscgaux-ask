@@ -17,7 +17,6 @@ os.environ["LANGCHAIN_PROJECT"] = "ui.py on ASK main/cloud" # use this for local
 
 
 from utils.backends_bridge import (
-    get_catalog_connector,
     fetch_table_and_date_from_catalog,
 )
 from utils import rag
@@ -43,8 +42,7 @@ last_update_date: str = ""
 backend_ready: bool = False
 
 try:
-    catalog = get_catalog_connector()
-    df, last_update_date = fetch_table_and_date_from_catalog(catalog)
+    df, last_update_date = fetch_table_and_date_from_catalog()
     backend_ready = True
 except Exception as exc:
     import logging

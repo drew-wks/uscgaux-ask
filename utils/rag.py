@@ -15,7 +15,6 @@ from langsmith import traceable  # RAG pipeline instrumentation platform
 from .filter import build_retrieval_filter, catalog_filter
 from .backends_bridge import (
     get_vectordb_connector,
-    get_catalog_connector,
     fetch_table_and_date_from_catalog,
 )
 
@@ -237,8 +236,7 @@ def rag(
     # build filter (optional) and retriever
     print(f"Received filter conditions from user: \n{filter_conditions}")
     
-    catalog = get_catalog_connector()
-    catalog_df, _ = fetch_table_and_date_from_catalog(catalog)
+    catalog_df, _ = fetch_table_and_date_from_catalog()
     allowed_ids = catalog_filter(catalog_df, filter_conditions)
     retrieval_filter = build_retrieval_filter(
         filter_conditions,

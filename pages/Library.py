@@ -7,7 +7,6 @@ import streamlit as st
 st.set_page_config(page_title="ASK Auxiliary Source of Knowledge", initial_sidebar_state="collapsed")
 
 from utils.backends_bridge import (
-    get_catalog_connector,
     fetch_table_and_date_from_catalog,
 )
 from uscgaux import stui
@@ -36,8 +35,7 @@ with tab2:
     last_update_date_ui = format_epoch_as_ui_string(last_update_date_ts)
     
     try:
-        catalog = get_catalog_connector()
-        df, last_update_date_ts = fetch_table_and_date_from_catalog(catalog)
+        df, last_update_date_ts = fetch_table_and_date_from_catalog()
         last_update_date_fn = format_epoch_as_filename_string(last_update_date_ts)
         last_update_date_ui = format_epoch_as_ui_string(last_update_date_ts)
     except Exception:

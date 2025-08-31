@@ -45,20 +45,14 @@ def get_backend_container() -> BackendContainer:
 
 
 
-@st.cache_data(show_spinner=False, hash_funcs={BackendContainer: lambda obj: f"BackendContainer-{id(obj)}"})
-def fetch_table_and_date(backend_connectors: BackendContainer) -> tuple[pd.DataFrame, str]:
-    """Compatibility wrapper: fetch catalog via a BackendContainer."""
-    return fetch_table_and_date_from_catalog(backend_connectors.catalog)
 
-
-@st.cache_data(show_spinner=False, hash_funcs={object: lambda obj: f"obj-{id(obj)}"})
-def fetch_table_and_date_from_catalog(catalog: CatalogConnectorProtocol) -> tuple[pd.DataFrame, str]:
+@st.cache_data(show_spinner=False)
+def fetch_table_and_date_from_catalog() -> tuple[pd.DataFrame, str]:
     """Return the catalog DataFrame and its last modified timestamp using a connector.
 
     Parameters
     ----------
-    catalog : CatalogConnectorProtocol
-        An object exposing the catalog interface used by ASK.
+    None
 
     Returns
     -------
@@ -71,6 +65,7 @@ def fetch_table_and_date_from_catalog(catalog: CatalogConnectorProtocol) -> tupl
         If the catalog cannot be accessed, is empty, or cannot be converted.
     """
     logger.info("fetching catalog and date via connector...")
+    catalog: CatalogConnectorProtocol = get_catalog_connector()
     core_df = catalog.fetch_table_and_normalize_catalog_df_for_core()
     if core_df is None or (isinstance(core_df, pd.DataFrame) and core_df.empty):
         logger.error("No catalog accessed or catalog is empty")

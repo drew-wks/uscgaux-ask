@@ -19,7 +19,7 @@ import pandas as pd
 import pytest
 import streamlit as st
 
-from utils.backends_bridge import get_backend_container, fetch_table_and_date
+from utils.backends_bridge import get_backend_container
 
 
 logger = logging.getLogger(__name__)
@@ -74,19 +74,3 @@ def test_get_backend_container_live() -> None:
 
 @pytest.mark.skipif(not live_env_enabled, reason="Set ASK_LIVE_TESTS=1 to enable live backend tests")
 @pytest.mark.skipif(not _secrets_available(), reason="Streamlit secrets not available for live tests")
-def test_fetch_table_and_date_live() -> None:
-    """Fetch catalog and verify a non-empty DataFrame is returned.
-
-    Logs the resulting DataFrame shape for diagnostics.
-    """
-    container = get_backend_container()
-    assert container is not None, "BackendContainer is None"
-
-    df, last_updated = fetch_table_and_date(container)
-    assert isinstance(df, pd.DataFrame), "Expected a pandas DataFrame"
-    assert not df.empty, "Catalog DataFrame is empty"
-    assert isinstance(last_updated, str) and last_updated.strip(), "Missing last_updated string"
-
-    logger.info("Catalog DataFrame shape: %d rows x %d cols", df.shape[0], df.shape[1])
-    logger.info("Catalog last updated: %s", last_updated)
-
