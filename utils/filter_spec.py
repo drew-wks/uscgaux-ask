@@ -104,7 +104,7 @@ def validate_local_spec_against_upstream(strict: bool = False) -> bool:
     filterable_upstream: Optional[Set[str]] = None
     try:
         # Defer import to runtime; package may not be present during tests
-        from uscgaux.schema_util import get_filterable_fields  # type: ignore
+        from uscgaux.utils.catalog_schema_utils import get_filterable_fields  # type: ignore
 
         try:
             upstream_fields = get_filterable_fields()
