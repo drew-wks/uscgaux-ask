@@ -21,6 +21,7 @@ from utils.backends_bridge import (
 )
 from utils import rag
 from uscgaux import stui, stu
+from utils.filter_spec import validate_local_spec_against_upstream
 import sidebar   
 
 stui.apply_ui_styles()
@@ -108,6 +109,14 @@ def initialize_session_states():
         st.session_state.filter_conditions = {}
 
 initialize_session_states()
+
+# Validate local filter spec against upstream on startup (warn-only in Phase 1)
+try:
+    validate_local_spec_against_upstream(strict=False)
+except Exception:
+    # Do not block UI on validation errors in Phase 1
+    import logging as _logging
+    _logging.getLogger(__name__).exception("FilterSpec validation raised unexpectedly")
 st.session_state["filter_conditions"] = sidebar.build_sidebar()
 
 
