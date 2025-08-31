@@ -23,7 +23,6 @@ except Exception:
 
 
 from utils import rag
-from utils.rag import CONFIG
 
 # Config Langsmith
 os.environ["LANGCHAIN_API_KEY"] = st.secrets["LANGCHAIN_API_KEY"]

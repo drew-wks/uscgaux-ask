@@ -25,6 +25,30 @@ def test_get_retriever_passes_filter(monkeypatch):
 
     import utils.rag as rag
 
+    # Provide minimal config via monkeypatch to satisfy strict accessor
+    # Structure covers only what get_retriever reads
+    strict_cfg = {
+        "RAG": {
+            "RETRIEVAL": {
+                "search_type": "mmr",
+                "k": 5,
+                "fetch_k": 20,
+                "lambda_mult": 0.7,
+            }
+        },
+        "RAG_ALL": {
+            # retriever metadata attachment in rag.rag() (unused here)
+        },
+    }
+
+    def _strict_config(path):
+        cur = strict_cfg
+        for key in path:
+            cur = cur[key]
+        return cur
+
+    monkeypatch.setattr(rag, "config", _strict_config, raising=True)
+
     # Create a fake vectorstore retriever that records kwargs
     class DummyRetriever:
         def __init__(self):
@@ -54,4 +78,4 @@ def test_get_retriever_passes_filter(monkeypatch):
     # Our get_retriever returns the retriever from the vectorstore
     assert isinstance(retriever, DummyRetriever)
     assert retriever.search_kwargs["filter"] is dummy_filter
-    assert retriever.search_type == rag.CONFIG["ASK_search_type"]
+    assert retriever.search_type == _strict_config(["RAG", "RETRIEVAL", "search_type"])

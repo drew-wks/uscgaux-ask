@@ -9,6 +9,7 @@ from uscgaux import stu
 from uscgaux.config.loader import load_config_by_context
 from uscgaux.backends import BackendContainer
 from .protocols import CatalogConnectorProtocol, VectorDBConnectorProtocol
+from typing import Any, Iterable
 
 
 logger = logging.getLogger(__name__)
@@ -22,7 +23,7 @@ def get_backend_container() -> BackendContainer:
     """Return a cached BackendContainer
 
     Loads the active configuration via ``load_config_by_context()`` and passes
-    it into ``stu.cached_init_connectors(cfg)`` for initialization.
+    it into ``stu.cached_init_connectors(config)`` for initialization.
 
     Returns
     -------
@@ -45,6 +46,72 @@ def get_backend_container() -> BackendContainer:
 
 
 
+
+@st.cache_resource(show_spinner=False)
+def get_runtime_config() -> dict:
+    """Return the active configuration mapping loaded by ``uscgaux``.
+
+    This isolates configuration loading/caching to avoid passing unhashable
+    structures through Streamlit cache boundaries. Other modules should call
+    this accessor instead of importing the loader directly.
+
+    Returns
+    -------
+    dict
+        The configuration mapping from ``uscgaux.config.loader``.
+    """
+    try:
+        return load_config_by_context()
+    except Exception:
+        logger.exception("Failed to load runtime config via uscgaux loader")
+        st.error("⚠️ Could not load configuration. See logs for details.")
+        st.stop()  # NoReturn
+
+
+def config(path: Iterable[str] | str) -> Any:
+    """Access a nested configuration value without fallbacks.
+
+    Accepts either a list/tuple of keys or a dot-delimited string and returns
+    the nested value. If any key is missing, raises ``KeyError`` with a helpful
+    message. This intentionally avoids defaults/fallbacks to surface misconfigurations
+    early.
+
+    Parameters
+    ----------
+    path : Iterable[str] | str
+        The key path to traverse, e.g., ["RAG", "RETRIEVAL", "k"] or
+        "RAG.RETRIEVAL.k".
+
+    Returns
+    -------
+    Any
+        The value stored at the provided path.
+
+    Raises
+    ------
+    KeyError
+        If any segment of the path is missing in the configuration mapping.
+    TypeError
+        If ``path`` is not an iterable of strings or a string.
+    """
+    cfg = get_runtime_config()
+
+    if isinstance(path, str):
+        keys = [k for k in path.split(".") if k]
+    elif isinstance(path, Iterable):
+        keys = list(path)
+    else:
+        raise TypeError("path must be a list/tuple of strings or a dot string")
+
+    cur: Any = cfg
+    traversed: list[str] = []
+    for key in keys:
+        traversed.append(str(key))
+        if not isinstance(cur, dict) or key not in cur:
+            joined = "/".join(traversed)
+            raise KeyError(f"Missing configuration at '{joined}' (key '{key}' not found)")
+        cur = cur[key]
+    return cur
 
 @st.cache_data(show_spinner=False)
 def fetch_table_and_date_from_catalog() -> tuple[pd.DataFrame, str]:
