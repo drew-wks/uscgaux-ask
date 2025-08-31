@@ -3,11 +3,12 @@ st-click-detector
 openai # dependency for langchain-openai
 langchain # not sure this is being used
 langchain-openai
-langchain_qdrant
+langchain-qdrant
 langchain-ollama
 langsmith # tracing
 qdrant-client   # testing removing this for pydantic issue ==1.6.3
 pandas
+typing-extensions
 
 gspread
 google-auth
@@ -16,11 +17,10 @@ requests==2.32.3 #  for GitHub Actions. used to access qdrant
 
 # External merged schema provider for ASK UI
 git+https://github.com/drew-wks/uscgaux.git@main#egg=uscgaux
-selenium==4.25 #  for GitHub Actions. needed to check for app Streamlit suspension due to inactivity
+selenium==4.25.0 #  for GitHub Actions. needed to check for app Streamlit suspension due to inactivity
 streamlit_extras
 streamlit_feedback 
 tiktoken # not sure this is being used
 webdriver-manager==4.0.2  #  for GitHub Actions. Check for Streamlit app suspension due to inactivity
 
 # git+https://github.com/drew-wks/uscgaux.git@main#egg=uscgaux
-
