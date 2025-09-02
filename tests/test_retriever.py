@@ -1,5 +1,6 @@
 import os
 import sys
+from typing import Any
 import pytest
 from qdrant_client.http import models
 import streamlit as st
@@ -41,19 +42,15 @@ def test_get_retriever_passes_filter(monkeypatch):
         },
     }
 
-    def _strict_config(path):
-        cur = strict_cfg
-        for key in path:
-            cur = cur[key]
-        return cur
-
-    monkeypatch.setattr(rag, "config", _strict_config, raising=True)
+    # Patch rag.get_runtime_config to avoid importing external uscgaux config
+    monkeypatch.setattr(rag, "get_runtime_config", lambda: strict_cfg, raising=True)
 
     # Create a fake vectorstore retriever that records kwargs
     class DummyRetriever:
         def __init__(self):
-            self.search_type = None
-            self.search_kwargs = None
+            self.search_type: str | None = None
+            # Initialize as a dict to satisfy static type checking
+            self.search_kwargs: dict[str, Any] = {}
 
         def as_retriever(self, search_type, search_kwargs):
             self.search_type = search_type
@@ -78,4 +75,4 @@ def test_get_retriever_passes_filter(monkeypatch):
     # Our get_retriever returns the retriever from the vectorstore
     assert isinstance(retriever, DummyRetriever)
     assert retriever.search_kwargs["filter"] is dummy_filter
-    assert retriever.search_type == _strict_config(["RAG", "RETRIEVAL", "search_type"])
+    assert retriever.search_type == strict_cfg["RAG"]["RETRIEVAL"]["search_type"]

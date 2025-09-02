@@ -1,12 +1,15 @@
 import os
 import time
+from typing import Any
 import pytest
 import streamlit as st
 
+# Ensure AppTest is always bound for static analysis
 try:
-    from streamlit.testing.v1 import AppTest
+    from streamlit.testing.v1 import AppTest  # type: ignore[import-not-found]
     app_test_available = True
 except Exception:
+    AppTest = None  # type: ignore[assignment]
     app_test_available = False
 
 # requries streamlit version >=1.18

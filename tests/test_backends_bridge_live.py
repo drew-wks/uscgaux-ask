@@ -70,7 +70,3 @@ def test_get_backend_container_live() -> None:
     # Basic interface checks (duck-typing to avoid importing protocols)
     assert hasattr(container, "catalog"), "container.catalog is missing"
     logger.info("✅ Backend container acquired with catalog connector present")
-
-
-@pytest.mark.skipif(not live_env_enabled, reason="Set ASK_LIVE_TESTS=1 to enable live backend tests")
-@pytest.mark.skipif(not _secrets_available(), reason="Streamlit secrets not available for live tests")

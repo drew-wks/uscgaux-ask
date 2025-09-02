@@ -14,7 +14,7 @@ def build_retrieval_filter(
     All other filtering is handled using the catalog.
     """
 
-    must: list[models.FieldCondition] = []
+    must: list[models.Condition] = []
     if allowed_pdf_ids is not None:
         must.append(
             models.FieldCondition(
