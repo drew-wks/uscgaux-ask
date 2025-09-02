@@ -51,11 +51,12 @@ The data flow model is below. <br><br>
 
 ## Technology Components
 
-ASK relies on five core components: a python codebase, a Gen AI model, vector database, a runtime environment, and a Web app server. It has been designed to take advantage of open-source to allow continued innovation and to keep costs low.
+The ASK system relies on two interdependent services: a End-user service for retrieval augmented genreation (this repo) which and an Administrative Module to handle document ingestion and configuration of the overall system.
 
 The main components of the solution are:
 
-  - **Codebase**: written by me in Python 3.8.10 using open source licenses. Version control is via a public git repository located at _https://github.com/drew-wks/ASK. Development workflow is notated [here.](docs/project_development_workflow.md)
+  - **RAG and Admin Codebases**: (this project) written by me in Python 3.8.10 using open source licenses. Version control is via a public git repository located at _https://github.com/drew-wks/ASK. Development workflow is notated [here.](docs/project_development_workflow.md)
+
 
 - **Embedding model**: Embeddings are generated using OpenAI Ada v.2 which is providing state of the art (SOTA) embeddings at the time of this writing. The model is accessed from the code via API. Alternatives exist and may provide superior results or same for less cost. More on this embedding can be found here: https://platform.openai.com/docs/guides/embeddings/what-are-embeddings
 

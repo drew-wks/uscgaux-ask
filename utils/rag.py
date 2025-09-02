@@ -1,7 +1,7 @@
 import os  # needed for local testing
 import re
 import logging
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Any
 from typing_extensions import Annotated, TypedDict
 import pandas as pd
 from functools import lru_cache
@@ -15,7 +15,7 @@ from .filter import build_retrieval_filter, catalog_filter
 from .backends_bridge import (
     get_vectordb_connector,
     fetch_table_and_date_from_catalog,
-    config,
+    get_runtime_config,
 )
 
 
@@ -48,11 +48,12 @@ def get_retriever(retrieval_filter: Optional[models.Filter]):
     Any
         A retriever object from the configured vector store.
     """
-    #  config access
-    search_type = config(["RAG", "RETRIEVAL", "search_type"])  
-    k = config(["RAG", "RETRIEVAL", "k"])  # e.g. 5
-    fetch_k = config(["RAG", "RETRIEVAL", "fetch_k"]) 
-    lambda_mult = config(["RAG", "RETRIEVAL", "lambda_mult"])  
+    #  Config access (hard-fail on missing keys)
+    cfg = get_runtime_config()
+    search_type = cfg["RAG"]["RETRIEVAL"]["search_type"]
+    k = cfg["RAG"]["RETRIEVAL"]["k"]  # e.g. 5
+    fetch_k = cfg["RAG"]["RETRIEVAL"]["fetch_k"]
+    lambda_mult = cfg["RAG"]["RETRIEVAL"]["lambda_mult"]
 
     vectordb = get_vectordb_connector()
     qdrant = vectordb.get_langchain_vectorstore()
@@ -227,9 +228,10 @@ def rag(
         enriched_question, and context.
     """
 
-    # Load generation settings from config
-    _model = config(["RAG", "GENERATION", "model"])  # e.g. "gpt-4o-mini"
-    _temperature = config(["RAG", "GENERATION", "temperature"])  # e.g. 0.7
+    # Load generation settings from config (hard fail if missing)
+    cfg = get_runtime_config()
+    _model = cfg["RAG_ALL"]["model"]  # e.g. "gpt-4o-mini"
+    _temperature = cfg["RAG_ALL"]["temperature"]  # e.g. 0.7
 
     # Primary LLM (OpenAI)
     llm = ChatOpenAI(model=_model, max_retries=2, timeout=45, temperature=_temperature)
@@ -271,7 +273,7 @@ def rag(
     logger.info("Created retrieval filter: %s", retrieval_filter)
 
     # Prepare tracing metadata from config
-    _rag_all = config(["RAG_ALL"])  # attach full RAG_ALL as retriever metadata
+    _rag_all = cfg["RAG_ALL"]  # attach full RAG_ALL as retriever metadata
     retriever = get_retriever(retrieval_filter=retrieval_filter).with_config(metadata=_rag_all)
     
     

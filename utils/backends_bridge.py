@@ -9,7 +9,7 @@ from uscgaux import stu
 from uscgaux.config.loader import load_config_by_context
 from uscgaux.backends import BackendContainer
 from .protocols import CatalogConnectorProtocol, VectorDBConnectorProtocol
-from typing import Any, Iterable
+from typing import Any
 
 
 logger = logging.getLogger(__name__)
@@ -68,50 +68,8 @@ def get_runtime_config() -> dict:
         st.stop()  # NoReturn
 
 
-def config(path: Iterable[str] | str) -> Any:
-    """Access a nested configuration value without fallbacks.
-
-    Accepts either a list/tuple of keys or a dot-delimited string and returns
-    the nested value. If any key is missing, raises ``KeyError`` with a helpful
-    message. This intentionally avoids defaults/fallbacks to surface misconfigurations
-    early.
-
-    Parameters
-    ----------
-    path : Iterable[str] | str
-        The key path to traverse, e.g., ["RAG", "RETRIEVAL", "k"] or
-        "RAG.RETRIEVAL.k".
-
-    Returns
-    -------
-    Any
-        The value stored at the provided path.
-
-    Raises
-    ------
-    KeyError
-        If any segment of the path is missing in the configuration mapping.
-    TypeError
-        If ``path`` is not an iterable of strings or a string.
-    """
-    cfg = get_runtime_config()
-
-    if isinstance(path, str):
-        keys = [k for k in path.split(".") if k]
-    elif isinstance(path, Iterable):
-        keys = list(path)
-    else:
-        raise TypeError("path must be a list/tuple of strings or a dot string")
-
-    cur: Any = cfg
-    traversed: list[str] = []
-    for key in keys:
-        traversed.append(str(key))
-        if not isinstance(cur, dict) or key not in cur:
-            joined = "/".join(traversed)
-            raise KeyError(f"Missing configuration at '{joined}' (key '{key}' not found)")
-        cur = cur[key]
-    return cur
+## Note: Per project guidance, callers should use `get_runtime_config()` and
+## access values directly via dict indexing, e.g. `cfg["RAG"]["RETRIEVAL"]["k"]`.
 
 @st.cache_data(show_spinner=False)
 def fetch_table_and_date_from_catalog() -> tuple[pd.DataFrame, str]:
