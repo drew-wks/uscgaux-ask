@@ -232,7 +232,7 @@ def rag(
     # Load generation settings from config (hard fail if missing)
     config = stu.cached_load_config_by_context()
     
-    _model = config["RAG_ALL"]["model"]  # e.g. "gpt-4o-mini"
+    _model = config["RAG_ALL"]["generation_model"]  # e.g. "gpt-4o-mini"
     _temperature = config["RAG_ALL"]["temperature"]  # e.g. 0.7
 
     # Primary LLM (OpenAI)
@@ -275,7 +275,7 @@ def rag(
     logger.info("Created retrieval filter: %s", retrieval_filter)
 
     # Prepare tracing metadata from config
-    _rag_all = cfg["RAG_ALL"]  # attach full RAG_ALL as retriever metadata
+    _rag_all = config["RAG_ALL"]  # attach full RAG_ALL as retriever metadata
     retriever = get_retriever(retrieval_filter=retrieval_filter).with_config(metadata=_rag_all)
     
     
