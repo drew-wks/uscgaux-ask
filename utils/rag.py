@@ -17,6 +17,7 @@ from .backends_bridge import (
     get_vectordb_connector,
     fetch_table_and_date_from_catalog,
 )
+from .chat_model_factory import create_chat_model
 
 
 # st.secrets pulls from ~/.streamlit when run locally
@@ -235,11 +236,13 @@ def rag(
     _model = config["RAG_ALL"]["generation_model"]  # e.g. "gpt-4o-mini"
     _temperature = config["RAG_ALL"]["temperature"]  # e.g. 0.7
 
-    # Primary LLM (OpenAI)
-    llm = ChatOpenAI(model=_model, max_retries=2, timeout=45, temperature=_temperature)
+    # new approach allows config to determin chat model
+    llm = create_chat_model(config)
+
+    llm_openai = ChatOpenAI(model=_model, max_retries=2, timeout=45, temperature=_temperature)
 
     # Optional local/test LLM (Ollama)
-    _llm = ChatOllama(
+    llm_ollama = ChatOllama(
         model="deepseek-r1:8b",
         temperature=_temperature,
         client_kwargs={
