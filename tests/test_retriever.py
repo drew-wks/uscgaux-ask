@@ -42,8 +42,8 @@ def test_get_retriever_passes_filter(monkeypatch):
         },
     }
 
-    # Patch rag.get_runtime_config to avoid importing external uscgaux config
-    monkeypatch.setattr(rag, "get_runtime_config", lambda: strict_cfg, raising=True)
+    # Patch rag.stu.cached_load_config_by_context to avoid importing external uscgaux config
+    monkeypatch.setattr(rag, "stu.cached_load_config_by_context", lambda: strict_cfg, raising=True)
 
     # Create a fake vectorstore retriever that records kwargs
     class DummyRetriever:

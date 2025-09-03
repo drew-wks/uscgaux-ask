@@ -48,31 +48,6 @@ def get_backend_container() -> BackendContainer:
 
 
 
-
-@st.cache_resource(show_spinner=False)
-def get_runtime_config() -> dict:
-    """Return the active configuration mapping loaded by ``uscgaux``.
-
-    This isolates configuration loading/caching to avoid passing unhashable
-    structures through Streamlit cache boundaries. Other modules should call
-    this accessor instead of importing the loader directly.
-
-    Returns
-    -------
-    dict
-        The configuration mapping from ``uscgaux.config.loader``.
-    """
-    try:
-        return load_config_by_context()
-    except Exception:
-        logger.exception("Failed to load runtime config via uscgaux loader")
-        st.error("⚠️ Could not load configuration. See logs for details.")
-        st.stop()  # NoReturn
-
-
-## Note: Per project guidance, callers should use `get_runtime_config()` and
-## access values directly via dict indexing, e.g. `cfg["RAG"]["RETRIEVAL"]["k"]`.
-
 @st.cache_data(show_spinner=False)
 def fetch_table_and_date_from_catalog() -> tuple[pd.DataFrame, str]:
     """Return the catalog DataFrame and its last modified timestamp using a connector.

@@ -12,10 +12,10 @@ from langchain_ollama import ChatOllama  # to test other LLMs
 from langchain_core.prompts import ChatPromptTemplate
 from langsmith import traceable  # RAG pipeline instrumentation platform
 from .filter import build_retrieval_filter, catalog_filter
+from uscgaux import stu
 from .backends_bridge import (
     get_vectordb_connector,
     fetch_table_and_date_from_catalog,
-    get_runtime_config,
 )
 
 
@@ -49,11 +49,12 @@ def get_retriever(retrieval_filter: Optional[models.Filter]):
         A retriever object from the configured vector store.
     """
     #  Config access (hard-fail on missing keys)
-    cfg = get_runtime_config()
-    search_type = cfg["RAG"]["RETRIEVAL"]["search_type"]
-    k = cfg["RAG"]["RETRIEVAL"]["k"]  # e.g. 5
-    fetch_k = cfg["RAG"]["RETRIEVAL"]["fetch_k"]
-    lambda_mult = cfg["RAG"]["RETRIEVAL"]["lambda_mult"]
+    config = stu.cached_load_config_by_context()
+    
+    search_type = config["RAG"]["RETRIEVAL"]["search_type"]
+    k = config["RAG"]["RETRIEVAL"]["k"]  # e.g. 5
+    fetch_k = config["RAG"]["RETRIEVAL"]["fetch_k"]
+    lambda_mult = config["RAG"]["RETRIEVAL"]["lambda_mult"]
 
     vectordb = get_vectordb_connector()
     qdrant = vectordb.get_langchain_vectorstore()
@@ -229,9 +230,10 @@ def rag(
     """
 
     # Load generation settings from config (hard fail if missing)
-    cfg = get_runtime_config()
-    _model = cfg["RAG_ALL"]["model"]  # e.g. "gpt-4o-mini"
-    _temperature = cfg["RAG_ALL"]["temperature"]  # e.g. 0.7
+    config = stu.cached_load_config_by_context()
+    
+    _model = config["RAG_ALL"]["model"]  # e.g. "gpt-4o-mini"
+    _temperature = config["RAG_ALL"]["temperature"]  # e.g. 0.7
 
     # Primary LLM (OpenAI)
     llm = ChatOpenAI(model=_model, max_retries=2, timeout=45, temperature=_temperature)
