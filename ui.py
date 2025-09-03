@@ -13,7 +13,7 @@ from streamlit_extras.stylable_container import stylable_container
 # Config LangSmith
 os.environ["LANGCHAIN_API_KEY_ASK"] = st.secrets["LANGCHAIN_API_KEY"] # check which account you are using
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
-os.environ["LANGCHAIN_PROJECT"] = "ui.py on ASK main/cloud" # use this for local testing
+os.environ["LANGCHAIN_PROJECT"] = st.secrets["LANGCHAIN_PROJECT"] # use this for local testing
 
 
 from utils.backends_bridge import (
@@ -37,7 +37,7 @@ api_operational = "operational" in api_status_message
 if not api_operational:
     st.error(f"ASK is currently down due to OpenAI issue: '{api_status_message}.'")
 
-# Ensure variables exist even if initialization fails
+# Ensure variables exist even if backend initialization fails
 df: pd.DataFrame = pd.DataFrame()
 last_update_date: str = ""
 backend_ready: bool = False
