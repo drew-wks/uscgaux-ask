@@ -68,5 +68,14 @@ This UI communicates with configured backends (e.g., vector DB, catalog) at runt
 - OpenAI or LangSmith errors: confirm `OPENAI_API_KEY_ASK` and `LANGCHAIN_API_KEY` are set in `secrets.toml`.
 - Filter spec warnings: see `utils/filter_spec.py` and the upstream spec referenced there.
 
-## License
+## Usage License
 See `LICENSE.txt`.
+
+## Compliance
+### Dependencies Licenses
+Proejct dependencies are scanned and verified free from strong copyleft (aka "viral") licenses listed in `liccheck.ini` using `licensecheck`. To renew scan, 
+
+```bash
+pip install requirements-dev.txt
+licensecheck > logs/license_scan_results_updated.txt
+```

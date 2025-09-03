@@ -1,0 +1,168 @@
+                                                 
+                      Info                       
+┏━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Item            ┃ Value                       ┃
+┡━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ program         │ licensecheck                │
+│ version         │ 2025.1.0                    │
+│ license         │ MIT LICENSE                 │
+│ project_license │ NO LICENSE/ UNKNOWN LICENSE │
+└─────────────────┴─────────────────────────────┘
+                                                                                                 
+                                        List Of Packages                                         
+┏━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Compatible ┃ Package                     ┃ License(s)                                         ┃
+┡━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ ✔          │ altair                      │ BSD LICENSE                                        │
+│ ✔          │ altex                       │ APACHE-2.0                                         │
+│ ✔          │ annotated-types             │ MIT LICENSE                                        │
+│ ✔          │ anyio                       │ MIT                                                │
+│ ✔          │ asn1crypto                  │ MIT LICENSE                                        │
+│ ✔          │ attrs                       │ MIT LICENSE                                        │
+│ ✔          │ beautifulsoup4              │ MIT LICENSE                                        │
+│ ✔          │ blinker                     │ MIT LICENSE                                        │
+│ ✔          │ boto3                       │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ botocore                    │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ cachetools                  │ MIT LICENSE                                        │
+│ ✖          │ certifi                     │ MOZILLA PUBLIC LICENSE 2.0 _MPL 2.0_               │
+│ ✔          │ cffi                        │ MIT LICENSE                                        │
+│ ✔          │ charset-normalizer          │ MIT                                                │
+│ ✔          │ click                       │ BSD-3-CLAUSE                                       │
+│ ✔          │ cloudpickle                 │ BSD LICENSE                                        │
+│ ✔          │ contourpy                   │ BSD LICENSE                                        │
+│ ✔          │ cryptography                │ APACHE SOFTWARE LICENSE;; BSD LICENSE              │
+│ ✔          │ cycler                      │ BSD LICENSE                                        │
+│ ✔          │ distro                      │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ entrypoints                 │ MIT LICENSE                                        │
+│ ✔          │ faker                       │ MIT LICENSE                                        │
+│ ✔          │ favicon                     │ MIT LICENSE                                        │
+│ ✔          │ filelock                    │ THE UNLICENSE _UNLICENSE_                          │
+│ ✔          │ fonttools                   │ MIT                                                │
+│ ✔          │ gitdb                       │ BSD LICENSE                                        │
+│ ✔          │ gitpython                   │ BSD-3-CLAUSE                                       │
+│ ✔          │ google-api-core             │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ google-api-python-client    │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ google-auth                 │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ google-auth-httplib2        │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ google-auth-oauthlib        │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ googleapis-common-protos    │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ grpcio                      │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ gspread                     │ MIT LICENSE                                        │
+│ ✔          │ h11                         │ MIT LICENSE                                        │
+│ ✔          │ h2                          │ MIT LICENSE                                        │
+│ ✔          │ hpack                       │ MIT LICENSE                                        │
+│ ✔          │ htbuilder                   │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ httpcore                    │ BSD LICENSE                                        │
+│ ✔          │ httplib2                    │ MIT LICENSE                                        │
+│ ✔          │ httpx                       │ BSD LICENSE                                        │
+│ ✔          │ hyperframe                  │ MIT LICENSE                                        │
+│ ✔          │ idna                        │ BSD LICENSE                                        │
+│ ✔          │ jinja2                      │ BSD LICENSE                                        │
+│ ✔          │ jiter                       │ MIT LICENSE                                        │
+│ ✔          │ jmespath                    │ MIT LICENSE                                        │
+│ ✔          │ jsonpatch                   │ BSD LICENSE                                        │
+│ ✔          │ jsonpointer                 │ BSD LICENSE                                        │
+│ ✔          │ jsonschema                  │ MIT                                                │
+│ ✔          │ jsonschema-specifications   │ MIT                                                │
+│ ✔          │ kiwisolver                  │ BSD LICENSE                                        │
+│ ✔          │ langchain                   │ MIT                                                │
+│ ✔          │ langchain-core              │ MIT                                                │
+│ ✔          │ langchain-ollama            │ MIT                                                │
+│ ✔          │ langchain-openai            │ MIT                                                │
+│ ✔          │ langchain-qdrant            │ MIT LICENSE                                        │
+│ ✔          │ langchain-text-splitters    │ MIT                                                │
+│ ✔          │ langsmith                   │ MIT                                                │
+│ ✔          │ lxml                        │ BSD LICENSE                                        │
+│ ✔          │ markdown                    │ BSD-3-CLAUSE                                       │
+│ ✔          │ markdownlit                 │ APACHE LICENSE                                     │
+│ ✔          │ markupsafe                  │ BSD LICENSE                                        │
+│ ✔          │ matplotlib                  │ PYTHON SOFTWARE FOUNDATION LICENSE                 │
+│ ✔          │ narwhals                    │ MIT LICENSE                                        │
+│ ✔          │ numpy                       │ BSD LICENSE                                        │
+│ ✔          │ oauthlib                    │ BSD-3-CLAUSE                                       │
+│ ✔          │ ollama                      │ MIT                                                │
+│ ✔          │ openai                      │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ orjson                      │ APACHE SOFTWARE LICENSE;; MIT LICENSE              │
+│ ✔          │ outcome                     │ APACHE SOFTWARE LICENSE;; MIT LICENSE              │
+│ ✔          │ packaging                   │ APACHE SOFTWARE LICENSE;; BSD LICENSE              │
+│ ✔          │ pandas                      │ BSD LICENSE                                        │
+│ ✔          │ pillow                      │ MIT-CMU                                            │
+│ ✔          │ platformdirs                │ MIT LICENSE                                        │
+│ ✔          │ plotly                      │ MIT LICENSE                                        │
+│ ✔          │ portalocker                 │ BSD-3-CLAUSE                                       │
+│ ✔          │ prometheus-client           │ APACHE-2.0;; BSD-2-CLAUSE                          │
+│ ✔          │ proto-plus                  │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ protobuf                    │ 3-CLAUSE BSD LICENSE                               │
+│ ✔          │ pyarrow                     │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ pyasn1                      │ BSD LICENSE                                        │
+│ ✔          │ pyasn1-modules              │ BSD LICENSE                                        │
+│ ✔          │ pycparser                   │ BSD LICENSE                                        │
+│ ✔          │ pydantic                    │ MIT LICENSE                                        │
+│ ✔          │ pydantic-core               │ MIT LICENSE                                        │
+│ ✔          │ pydeck                      │ APACHE LICENSE 2.0                                 │
+│ ✔          │ pyjwt                       │ MIT LICENSE                                        │
+│ ✔          │ pymdown-extensions          │ MIT LICENSE                                        │
+│ ✔          │ pyopenssl                   │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ pyparsing                   │ MIT LICENSE                                        │
+│ ✔          │ pysocks                     │ BSD                                                │
+│ ✔          │ python-dateutil             │ APACHE SOFTWARE LICENSE;; BSD LICENSE              │
+│ ✔          │ python-dotenv               │ BSD LICENSE                                        │
+│ ✔          │ pytz                        │ MIT LICENSE                                        │
+│ ✔          │ pyyaml                      │ MIT LICENSE                                        │
+│ ✔          │ qdrant-client               │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ referencing                 │ MIT                                                │
+│ ✔          │ regex                       │ APACHE-2.0;; CNRI-PYTHON                           │
+│ ✔          │ requests                    │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ requests-oauthlib           │ BSD LICENSE                                        │
+│ ✔          │ requests-toolbelt           │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ rpds-py                     │ MIT                                                │
+│ ✔          │ rsa                         │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ s3transfer                  │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ selenium                    │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ setuptools                  │ MIT                                                │
+│ ✔          │ six                         │ MIT LICENSE                                        │
+│ ✔          │ smmap                       │ BSD LICENSE                                        │
+│ ✔          │ sniffio                     │ APACHE SOFTWARE LICENSE;; MIT LICENSE              │
+│ ✔          │ snowflake-connector-python  │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ snowflake-snowpark-python   │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ sortedcontainers            │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ soupsieve                   │ MIT LICENSE                                        │
+│ ✔          │ sqlalchemy                  │ MIT                                                │
+│ ✔          │ st-annotated-text           │ APACHE SOFTWARE LICENSE                            │
+│ ✖          │ st-click-detector           │ UNKNOWN                                            │
+│ ✔          │ st-theme                    │ MIT LICENSE                                        │
+│ ✔          │ streamlit                   │ APACHE SOFTWARE LICENSE                            │
+│ ✖          │ streamlit-avatar            │                                                    │
+│ ✖          │ streamlit-camera-input-live │                                                    │
+│ ✔          │ streamlit-card              │ MIT LICENSE                                        │
+│ ✖          │ streamlit-embedcode         │ UNKNOWN                                            │
+│ ✔          │ streamlit-extras            │ APACHE-2.0                                         │
+│ ✖          │ streamlit-faker             │                                                    │
+│ ✔          │ streamlit-feedback          │ MIT LICENSE                                        │
+│ ✔          │ streamlit-image-coordinates │ MIT LICENSE                                        │
+│ ✖          │ streamlit-keyup             │                                                    │
+│ ✔          │ streamlit-notify            │ MIT LICENSE                                        │
+│ ✖          │ streamlit-toggle-switch     │ UNKNOWN                                            │
+│ ✖          │ streamlit-vertical-slider   │                                                    │
+│ ✔          │ tenacity                    │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ tiktoken                    │ MIT LICENSE                                        │
+│ ✔          │ toml                        │ MIT LICENSE                                        │
+│ ✔          │ tomlkit                     │ MIT LICENSE                                        │
+│ ✔          │ tornado                     │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ tqdm                        │ MIT LICENSE;; MOZILLA PUBLIC LICENSE 2.0 _MPL 2.0_ │
+│ ✔          │ trio                        │ APACHE-2.0;; MIT                                   │
+│ ✔          │ trio-websocket              │ MIT LICENSE                                        │
+│ ✔          │ typing-extensions           │ PSF-2.0                                            │
+│ ✔          │ typing-inspection           │ MIT                                                │
+│ ✔          │ tzdata                      │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ tzlocal                     │ MIT LICENSE                                        │
+│ ✔          │ uritemplate                 │ APACHE-2.0;; BSD 3-CLAUSE                          │
+│ ✔          │ urllib3                     │ MIT                                                │
+│ ✔          │ validators                  │ MIT LICENSE                                        │
+│ ✔          │ webdriver-manager           │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ websocket-client            │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ wheel                       │ MIT LICENSE                                        │
+│ ✔          │ wsproto                     │ MIT LICENSE                                        │
+│ ✔          │ zstandard                   │ BSD LICENSE                                        │
+└────────────┴─────────────────────────────┴────────────────────────────────────────────────────┘
+

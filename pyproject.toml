@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "uscgaux-ask"
+version = "0.1.0"
+authors = [{name = "Drew Wilkins"}]
+requires-python = ">=3.11"
+readme = "README.md"
+urls = {"Homepage" = "https://github.com/drew-wks/uscgaux-ask"}
+dynamic = ["dependencies"]
+
+[tool.setuptools]
+packages = ["utils"]
+include-package-data = true
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+

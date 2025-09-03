@@ -6,6 +6,7 @@ IPython
 pyright
 
 fastapi
+licensecheck
 uvicorn
 flake8
 httpx
