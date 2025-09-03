@@ -22,8 +22,10 @@ if not logger.handlers:
 def get_backend_container() -> BackendContainer:
     """Return a cached BackendContainer
 
-    Loads the active configuration via ``load_config_by_context()`` and passes
-    it into ``stu.cached_init_connectors(config)`` for initialization.
+    Loads the active configuration via ``load_config_by_context()`` and initializes
+    connectors using the upstream initializer. Upstream now avoids hashing the
+    unhashable config by naming the cached parameter "_config", so we can call the
+    cached function directly here.
 
     Returns
     -------
