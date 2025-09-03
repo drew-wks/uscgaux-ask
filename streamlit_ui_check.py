@@ -6,32 +6,37 @@ from webdriver_manager.chrome import ChromeDriverManager
 import streamlit as st
 
 
-def check_app_status(url):
+def check_app_status(url, success_strings=None, failure_strings=None):
     """
     This function checks the status of a web application by navigating to the provided URL 
-    and searching for specific text strings ("USCG Auxiliary" and "Zzzz") on the page.
-    
-    The function uses Selenium to automate a Chrome browser in headless mode, which means 
-    it operates without a visible GUI. This is particularly useful in environments like 
-    GitHub Actions, where a graphical user interface is not available.
+    and searching for specific text strings on the page using Selenium to automate a 
+    Chrome browser in headless mode
 
     Args:
         url (str): The URL of the web page to check.
+        success_strings (list[str], optional): List of strings that indicate app is working.
+            Defaults to ["Hosted with Streamlit"].
+        failure_strings (list[str], optional): List of strings that indicate app is down.
+            Defaults to ["Zzzz"].
 
     Behavior:
-        - If the text "USCG Auxiliary" is found on the page, the function prints "USCG Auxiliary".
-        - If the text "Zzzz" is found on the page, the function prints "Zzzz".
-        - If neither text is found, the function prints the entire text content of the page.
-        - The function includes error handling to catch and report issues such as network errors or problems with the web driver setup.
+        - If any success string is found, prints success message.
+        - If any failure string is found, prints failure message.
+        - If neither are found, prints the entire text content of the page.
+        - Includes error handling for network errors or web driver issues.
 
     Note:
         This script is designed to run in headless mode, making it suitable for use in 
         environments without a GUI, such as in automated CI/CD pipelines on GitHub Actions.
 
     Example:
-        >>> check_app_status("https://ask-test.streamlit.app/")
-        USCG Auxiliary
+        >>> check_app_status("https://ask-test.streamlit.app/", ["USCG Auxiliary"], ["Zzzz"])
+        🎉 Yay! App is working: 'USCG Auxiliary'
     """
+    if success_strings is None:
+        success_strings = ["Hosted with Streamlit"]
+    if failure_strings is None:
+        failure_strings = ["Zzzz"]
     try:
         # Set up Chrome options for headless mode
         chrome_options = webdriver.ChromeOptions()
@@ -47,19 +52,30 @@ def check_app_status(url):
         time.sleep(5) # give time for javascript to load
         page_text = driver.find_element(By.TAG_NAME, "body").text
 
-        # Check for specific strings and print the found text
-        if "Hosted with Streamlit" in page_text:
-            print("🎉 Yay! App is working: 'Hosted with Streamlit'")
-        elif "Zzzz" in page_text:
-            print("⚠️ App is down: 'Zzzz'")
-        else:
-            print("Text found on the page:")
-            print(page_text)
+        # Check for success strings first
+        for success_string in success_strings:
+            if success_string in page_text:
+                print(f"🎉 Yay! App is working: '{success_string}'")
+                return
+
+        # Check for failure strings
+        for failure_string in failure_strings:
+            if failure_string in page_text:
+                print(f"⚠️ App is down: '{failure_string}'")
+                return
+
+        # If neither success nor failure strings found
+        print("Text found on the page:")
+        print(page_text)
 
     except Exception as e:
         print(f"An error occurred while trying to access {url}: {e}")
     finally:
         driver.quit()
 
-# Run the check
-check_app_status(st.secrets["APP_URL"])
+
+check_app_status(
+    st.secrets["APP_URL"], 
+    st.secrets.get("SUCCESS_STRINGS", ["Hosted with Streamlit"]), 
+    st.secrets.get("FAILURE_STRINGS", ["Zzzz"])
+)
