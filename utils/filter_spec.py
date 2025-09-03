@@ -96,7 +96,7 @@ def validate_local_spec_against_upstream(strict: bool = False) -> bool:
     local_names = {f.name for f in local_fields}
 
     # Fields that are local-only derived controls, not present as-is upstream
-    derived_ok: Set[str] = {"exclude_expired", "public_release"}
+    derived_ok: Set[str] = {"exclude_expired"}
 
     issues: List[str] = []
 

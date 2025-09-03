@@ -28,11 +28,8 @@ def build_sidebar():
     default_scopes: List[str]
     # Base scopes from the shared schema
     try:
-        # Read scopes from upstream and remove 'Area' if present
-        default_scopes = [
-            s for s in (str(x) for x in get_allowed_values("scope"))
-            if s.strip().lower() != "area"
-        ]
+        # Read scopes from upstream
+        default_scopes = [str(x) for x in get_allowed_values("scope")]
     except Exception:
         # If schema cannot be read at runtime, degrade to known values
         default_scopes = ["National", "District"]

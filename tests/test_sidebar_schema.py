@@ -107,12 +107,12 @@ def test_sidebar_uses_schema_when_available(monkeypatch: pytest.MonkeyPatch):
     assert filters.get("scope") in ("District", "National", "Both")
 
 
-def test_sidebar_excludes_area_option(monkeypatch: pytest.MonkeyPatch):
-    """If upstream exposes 'Area' as a scope, the UI should hide it."""
+def test_sidebar_includes_upstream_scope_options(monkeypatch: pytest.MonkeyPatch):
+    """The UI should include all scope options provided by upstream."""
     spy = SidebarSpy()
     _install_fake_streamlit(monkeypatch, spy)
-    # Include 'Area' in upstream values
-    _install_fake_schema(monkeypatch, scope_vals=["National", "District", "Area"], unit_vals=["1"])
+    # Use only the actual upstream scope values
+    _install_fake_schema(monkeypatch, scope_vals=["National", "District"], unit_vals=["1"])
     
     # Re-import sidebar to bind the fake schema
     if "sidebar" in sys.modules:
@@ -123,8 +123,10 @@ def test_sidebar_excludes_area_option(monkeypatch: pytest.MonkeyPatch):
 
     assert spy.radios, "No radio widget was created"
     radio_opts = spy.radios[0]["options"]
-    assert "Area" not in radio_opts, "'Area' should be excluded from scope options"
     assert "Both" in radio_opts, "Combined scope option 'Both' should be present"
+    assert "National" in radio_opts, "National should be present"
+    assert "District" in radio_opts, "District should be present"
+    assert len(radio_opts) == 3, "Should have exactly National, District, and Both options"
 
 
 def test_sidebar_fallback_without_schema(monkeypatch: pytest.MonkeyPatch):

@@ -10,7 +10,7 @@ from langsmith import Client
 from streamlit_extras.stylable_container import stylable_container
 
 
-# Config LangSmith
+# Config LangSmith observability
 os.environ["LANGCHAIN_API_KEY_ASK"] = st.secrets["LANGCHAIN_API_KEY"] # check which account you are using
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_PROJECT"] = st.secrets["LANGCHAIN_PROJECT"] # use this for local testing
