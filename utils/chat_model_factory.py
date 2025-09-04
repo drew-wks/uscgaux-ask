@@ -2,7 +2,6 @@
 import os 
 from typing import Mapping, Any
 import logging
-import streamlit as st
 from langchain_openai import ChatOpenAI
 from langchain_ollama import ChatOllama  # to test other LLMs
 
@@ -38,7 +37,7 @@ def create_chat_model(config: Mapping[str, Any]):
     if chat_model_type == "ChatOpenAI":
         
         # Config langchain_openai for langchain_openai.OpenAIEmbeddings
-        os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY_ASK"] # for openai client in cloud environment
+        os.environ["OPENAI_API_KEY"] = config["OPENAI_API_KEY_ASK"] # for openai client in cloud environment
 
         kwargs = {
             "model": model_name,
