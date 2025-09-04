@@ -1,14 +1,11 @@
-import os  # needed for local testing
+import os
 import re
 import logging
 from typing import List, Tuple, Optional, Any
 from typing_extensions import Annotated, TypedDict
 import pandas as pd
 from functools import lru_cache
-import streamlit as st
 from qdrant_client.http import models  # for running filters on the metadata
-from langchain_openai import ChatOpenAI
-from langchain_ollama import ChatOllama  # to test other LLMs
 from langchain_core.prompts import ChatPromptTemplate
 from langsmith import traceable  # RAG pipeline instrumentation platform
 from .filter import build_retrieval_filter, catalog_filter
@@ -20,13 +17,7 @@ from .backends_bridge import (
 from .chat_model_factory import create_chat_model
 
 
-# st.secrets pulls from ~/.streamlit when run locally
 
-
-# Config langchain_openai
-OPENAI_API_KEY = st.secrets["OPENAI_API_KEY_ASK"] # for langchain_openai.OpenAIEmbeddings
-
-os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY_ASK"] # for openai client in cloud environment
 
 
 logger = logging.getLogger(__name__)
@@ -239,16 +230,6 @@ def rag(
     # new approach allows config to determin chat model
     llm = create_chat_model(config)
 
-    llm_openai = ChatOpenAI(model=_model, max_retries=2, timeout=45, temperature=_temperature)
-
-    # Optional local/test LLM (Ollama)
-    llm_ollama = ChatOllama(
-        model="deepseek-r1:8b",
-        temperature=_temperature,
-        client_kwargs={
-            "timeout": 50,
-        },
-    )
     logger.info("🤖 Initiated RAG pipeline")
     # Enrich the question
     enriched_question = enrich_question(user_question, ACRONYMS_PATH, TERMS_PATH)

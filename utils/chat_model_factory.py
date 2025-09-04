@@ -1,7 +1,11 @@
 """Factory function to create chat models based on TOML configuration."""
-
+import os 
 from typing import Mapping, Any
 import logging
+import streamlit as st
+from langchain_openai import ChatOpenAI
+from langchain_ollama import ChatOllama  # to test other LLMs
+
 
 
 logger = logging.getLogger(__name__)
@@ -25,8 +29,6 @@ def create_chat_model(config: Mapping[str, Any]):
     Raises:
         ValueError: If unsupported chat model type is specified
     """
-    from langchain_openai import ChatOpenAI
-    from langchain_community.chat_models import ChatOllama
     
     rag_config = config["RAG_ALL"]
     chat_model_type = rag_config["langchain_chat_model"]
@@ -34,6 +36,10 @@ def create_chat_model(config: Mapping[str, Any]):
     temperature = rag_config["temperature"]
     
     if chat_model_type == "ChatOpenAI":
+        
+        # Config langchain_openai for langchain_openai.OpenAIEmbeddings
+        os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY_ASK"] # for openai client in cloud environment
+
         kwargs = {
             "model": model_name,
             "temperature": temperature
